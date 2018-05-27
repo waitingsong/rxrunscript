@@ -16,11 +16,14 @@ function runScript(script: string, options?: SpawnOptions, maxErrorBufferCount?:
 
   script = script.replace(/\\/g, '/').trimLeft()
 
+  /* istanbul ignore else */
   if (process.platform === 'win32') {
+    /* istanbul ignore next */
     sh = process.env.comspec || 'cmd'
     shFlag = '/d /s /c'
     opts.windowsVerbatimArguments = true
 
+    /* istanbul ignore else */
     if (script.slice(0, 2) === './' || script.slice(0, 3) === '../') {
       const arr = script.split(' ')
 
@@ -36,9 +39,11 @@ function runScript(script: string, options?: SpawnOptions, maxErrorBufferCount?:
       ? maxErrorBufferCount
       : 0
 
+    /* istanbul ignore else */
     if (proc.stdout) {
       proc.stdout.on('data', buf => obv.next(typeof buf === 'string' ? Buffer.from(buf) : buf))
     }
+    /* istanbul ignore else */
     if (proc.stderr) {
       proc.stderr.on('data', buf => {
         if (stderr.length <= errBufLimit) {
