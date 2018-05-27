@@ -1,10 +1,7 @@
 /// <reference types="mocha" />
 
 import * as assert from 'power-assert'
-import rewire = require('rewire')
-import * as rmdir from 'rimraf'
-import { of } from 'rxjs'
-import { buffer, reduce, tap } from 'rxjs/operators'
+import { reduce, tap } from 'rxjs/operators'
 
 import runScript from '../src/index'
 import {

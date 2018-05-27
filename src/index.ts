@@ -1,6 +1,5 @@
 import { spawn, SpawnOptions } from 'child_process'
-import { of, throwError, Observable, Observer } from 'rxjs'
-import { catchError } from 'rxjs/operators'
+import { Observable, Observer } from 'rxjs'
 
 import { join } from './shared/index'
 
