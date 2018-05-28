@@ -4,7 +4,7 @@ import { Observable, Observer } from 'rxjs'
 import { join } from './shared/index'
 
 
-function runScript(script: string, options?: SpawnOptions, maxErrorBufferCount?: number): Observable<Buffer> {
+export default function(script: string, options?: SpawnOptions, maxErrorBufferCount?: number): Observable<Buffer> {
   const initialOpts: SpawnOptions = {
     cwd: process.cwd(),
     env: { ...process.env },
@@ -80,5 +80,3 @@ function runScript(script: string, options?: SpawnOptions, maxErrorBufferCount?:
 
   return run$
 }
-
-export default runScript
