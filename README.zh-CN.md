@@ -16,10 +16,10 @@ $ npm install rxrunscript
 
 ## 使用
 ```ts
-import runScript from 'rxrunscript'
+import run from 'rxrunscript'
 import { take } from 'rxjs/operators'
 
-runScript('openssl version').pipe(
+run('openssl version').pipe(
   take(1),  // 假定一个 Buffer 就包括了所有输出
 )
   .subscribe(
@@ -31,7 +31,7 @@ runScript('openssl version').pipe(
 import { reduce } from 'rxjs/operators'
 
 // win32
-runScript('tasklist').pipe(
+run('tasklist').pipe(
   // 应该输出多个 Buffer
   reduce((acc: Buffer[], curr: Buffer) => {
     acc.push(curr)
