@@ -1,16 +1,25 @@
 import { dirname } from 'path'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
-import uglify from 'rollup-plugin-uglify'
+import { terser } from 'rollup-plugin-terser'
 import pkg from './package.json'
 
 // `npm run build` -> `production` is true
 // `npm run dev` -> `production` is false
 const production = ! process.env.ROLLUP_WATCH
+let name = pkg.name
 
-const name = parseName(pkg.name)
+if (name.slice(0, 1) === '@') {
+  name = name.split('/')[1]
+  if (! name) {
+    throw new TypeError('pkg.name invalid')
+  }
+}
+name = parseName(name)
+
 const targetDir = dirname(pkg.main)
 const deps = pkg.dependencies
+const peerDeps = pkg.peerDependencies
 
 const banner = `
 /**
@@ -53,8 +62,15 @@ const nodeModule = [
   'fs', 'path', 'util', 'os',
 ]
 
-for (const depName of Object.keys(deps)) {
-  external.push(depName)
+if (deps && Object.keys(deps).length) {
+  for (const depName of Object.keys(deps)) {
+    external.push(depName)
+  }
+}
+if (peerDeps && Object.keys(peerDeps).length) {
+  for (const depName of Object.keys(peerDeps)) {
+    external.push(depName)
+  }
 }
 
 
@@ -87,7 +103,7 @@ if (production) {
     {
       external: external.concat(nodeModule),
       input: pkg.module,
-      plugins: [ uglify(uglifyOpts) ],
+      plugins: [ terser(uglifyOpts) ],
       output: {
         banner,
         file: parseName(pkg.es2015) + '.min.js',
@@ -111,7 +127,7 @@ if (pkg.browser) {
           main: true,
         }),
         commonjs(),
-        production && uglify(uglifyOpts),
+        production && terser(uglifyOpts),
       ],
       output: {
         amd: { id: name },
@@ -126,9 +142,36 @@ if (pkg.browser) {
   )
 }
 
+if (pkg.bin) {
+  const shebang = `#!/usr/bin/env node\n\n${banner}`
+
+  for (const binPath of Object.values(pkg.bin)) {
+    if (! binPath) {
+      continue
+    }
+    const binSrcPath = binPath.includes('dist/') ? binPath : `./dist/${binPath}`
+
+    config.push({
+      external: external.concat(nodeModule),
+      input: binSrcPath,
+      output: [
+        {
+          file: binPath,
+          banner: shebang,
+          format: 'cjs',
+          globals,
+        },
+      ],
+    })
+  }
+
+}
+
+
+
 // remove pkg.name extension if exists
 function parseName(name) {
-  if (name) {
+  if (typeof name === 'string' && name) {
     const arr = name.split('.')
     const len = arr.length
 
@@ -138,6 +181,9 @@ function parseName(name) {
     else if (len === 2 || len === 1) {
       return arr[0]
     }
+  }
+  else {
+    throw new TypeError('name invalid')
   }
   return name
 }
