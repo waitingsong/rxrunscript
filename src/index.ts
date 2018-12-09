@@ -38,10 +38,14 @@ export function run(script: string, options?: SpawnOptions, maxErrorBufferCount?
     const errBufLimit = typeof maxErrorBufferCount === 'number' && maxErrorBufferCount > 0
       ? maxErrorBufferCount
       : 0
+    let isNext = false
 
     /* istanbul ignore else */
     if (proc.stdout) {
-      proc.stdout.on('data', buf => obv.next(typeof buf === 'string' ? Buffer.from(buf) : buf))
+      proc.stdout.on('data', buf => {
+        isNext || (isNext = true)
+        obv.next(typeof buf === 'string' ? Buffer.from(buf) : buf)
+      })
     }
     /* istanbul ignore else */
     if (proc.stderr) {
@@ -71,6 +75,7 @@ export function run(script: string, options?: SpawnOptions, maxErrorBufferCount?
         obv.error(new Error(`Run script with error code ${code}: "${sh} ${shFlag} ${script}"\n${errMsg}`))
       }
       else {
+        isNext || obv.next(Buffer.from(''))
         obv.complete()
       }
     })
