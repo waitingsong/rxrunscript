@@ -3,21 +3,19 @@
 import * as assert from 'power-assert'
 import { reduce, tap } from 'rxjs/operators'
 
-import runScript from '../src/index'
+import { run } from '../src/index'
 import {
   basename,
   join,
 } from '../src/shared/index'
 
 
-
 const filename = basename(__filename)
-
 
 describe(filename, () => {
 
   it('Should works running openssl', done => {
-    runScript('openssl version')
+    run('openssl version')
       .subscribe(
         buf => {
           try {
@@ -37,7 +35,7 @@ describe(filename, () => {
   })
 
   it('Should works running openssl with invalid args', done => {
-    runScript('openssl fake')
+    run('openssl fake')
       .subscribe(
         buf => {
           try {
@@ -73,7 +71,7 @@ describe(filename, () => {
       count = 5
     }
 
-    runScript(`ts-node ${file} ${count}`, options).pipe(
+    run(`ts-node ${file} ${count}`, options).pipe(
         tap(buf => console.log('got:', buf.toString().trim())),
         reduce((acc: Buffer[], curr: Buffer) => {
           acc.push(curr)

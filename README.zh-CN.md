@@ -16,7 +16,7 @@ $ npm install rxrunscript
 
 ## 使用
 ```ts
-import run from 'rxrunscript'
+import { run } from 'rxrunscript'
 import { take } from 'rxjs/operators'
 
 run('openssl version').pipe(
