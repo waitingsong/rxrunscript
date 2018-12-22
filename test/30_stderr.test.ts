@@ -47,9 +47,9 @@ describe(filename, () => {
         (err: Error) => {
           const msg = err ? err.message : ''
           if (msg) {
-            const arr = msg.split('\n')
+            const arr = msg.split(/\r\n|\n|\r/)
             const stderr = arr.length > 1 ? arr[1] : ''
-            assert(stderr === '.' || /\.+/.test(stderr) === true, msg)
+            assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
           }
           else {
             assert(false, err.message)
@@ -61,9 +61,9 @@ describe(filename, () => {
   })
 
 
-  it('Should got result with maxStderrBuffer: 100', done => {
+  it('Should got both result and stderr with maxStderrBuffer: 1', done => {
     const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
-    run(cmd, {}, 100)
+    run(cmd, {}, 1)
       .subscribe(
         buf => {
           try {
@@ -75,8 +75,38 @@ describe(filename, () => {
             assert(false, ex)
           }
         },
-        err => {
-          assert(false, err)
+        (err: Error) => {
+          const msg = err ? err.message : ''
+          if (msg) {
+            const arr = msg.split(/\r\n|\n|\r/)
+            const stderr = arr.length > 1 ? arr[1] : ''
+            assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
+          }
+          else {
+            assert(false, err.message)
+          }
+          done()
+        },
+        done,
+      )
+  })
+
+  it('Should got result with maxStderrBuffer: 10000', done => {
+    const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
+    run(cmd, {}, 10000)
+      .subscribe(
+        buf => {
+          try {
+            const ret = buf.toString()
+            const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
+            assert(ret.indexOf(needle) === 0, `result: "${ret}"`)
+          }
+          catch (ex) {
+            assert(false, ex)
+          }
+        },
+        (err: Error) => {
+          assert(false, err.message)
         },
         done,
       )
