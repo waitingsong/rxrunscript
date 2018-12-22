@@ -49,7 +49,7 @@ describe(filename, () => {
           if (msg) {
             const arr = msg.split('\n')
             const stderr = arr.length > 1 ? arr[1] : ''
-            assert(stderr === '.')
+            assert(stderr === '.' || /\.+\+{3}/.test(stderr) === true, msg)
           }
           else {
             assert(false, err.message)
