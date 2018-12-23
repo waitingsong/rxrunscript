@@ -3,25 +3,28 @@
 import * as assert from 'power-assert'
 import { reduce, tap } from 'rxjs/operators'
 
-import { run } from '../src/index'
+import { initialMsgPrefixOpts, run } from '../src/index'
 import {
   basename,
   join,
 } from '../src/shared/index'
 
+import { assertOnOpensslStderr } from './helper'
+
 
 const filename = basename(__filename)
+const { stderrPrefix } = initialMsgPrefixOpts
+const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
+const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
 
 describe(filename, () => {
 
   it('Should ignore stderr with maxStderrBuffer: -1  ', done => {
-    const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
     run(cmd, {}, -1)
       .subscribe(
         buf => {
           try {
             const ret = buf.toString()
-            const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
             assert(ret.indexOf(needle) === 0, `result: "${ret}"`)
           }
           catch (ex) {
@@ -37,7 +40,6 @@ describe(filename, () => {
   })
 
   it('Should got stderr immediately with maxStderrBuffer: 0', done => {
-    const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
     run(cmd, {}, 0)
       .subscribe(
         () => {
@@ -45,15 +47,7 @@ describe(filename, () => {
           done()
         },
         (err: Error) => {
-          const msg = err ? err.message : ''
-          if (msg) {
-            const arr = msg.split(/\r\n|\n|\r/)
-            const stderr = arr.length > 1 ? arr[1] : ''
-            assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
-          }
-          else {
-            assert(false, err.message)
-          }
+          assertOnOpensslStderr(err, stderrPrefix)
           done()
         },
         done,
@@ -62,13 +56,11 @@ describe(filename, () => {
 
 
   it('Should got both result and stderr with maxStderrBuffer: 1', done => {
-    const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
     run(cmd, {}, 1)
       .subscribe(
         buf => {
           try {
             const ret = buf.toString()
-            const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
             assert(ret.indexOf(needle) === 0, `result: "${ret}"`)
           }
           catch (ex) {
@@ -76,15 +68,7 @@ describe(filename, () => {
           }
         },
         (err: Error) => {
-          const msg = err ? err.message : ''
-          if (msg) {
-            const arr = msg.split(/\r\n|\n|\r/)
-            const stderr = arr.length > 1 ? arr[1] : ''
-            assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
-          }
-          else {
-            assert(false, err.message)
-          }
+          assertOnOpensslStderr(err, stderrPrefix)
           done()
         },
         done,
@@ -92,13 +76,11 @@ describe(filename, () => {
   })
 
   it('Should got result with maxStderrBuffer: 10000', done => {
-    const cmd = 'openssl genpkey -algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048 '
     run(cmd, {}, 10000)
       .subscribe(
         buf => {
           try {
             const ret = buf.toString()
-            const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
             assert(ret.indexOf(needle) === 0, `result: "${ret}"`)
           }
           catch (ex) {
