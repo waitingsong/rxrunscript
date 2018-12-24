@@ -20,9 +20,10 @@ $ npm install rxrunscript
 import { run } from 'rxrunscript'
 import { take } from 'rxjs/operators'
 
-run('openssl version').pipe(
-  take(1),  // assume all output in one buffer
-)
+run('openssl version')
+  .pipe(
+    take(1),  // assume all output in one buffer
+  )
   .subscribe(
     buf => console.log(buf.toString()), 
     err => console.error(err),
@@ -32,17 +33,18 @@ run('openssl version').pipe(
 import { reduce } from 'rxjs/operators'
 
 // win32
-run('tasklist').pipe(
-  // should output many Buffers
-  reduce((acc: Buffer[], curr: Buffer) => {
-    acc.push(curr)
-    return acc
-  }, []),
-)
+run('tasklist')
+  .pipe(
+    // should output Buffers
+    reduce((acc: Buffer[], curr: Buffer) => {
+      acc.push(curr)
+      return acc
+    }, []),
+  )
   .subscribe(
     arr => console.log(buf.join('').toString()),
     err => console.error(err),
-    () => console.log('complte'),
+    () => console.log('complete'),
   )
 
 ```

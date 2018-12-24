@@ -19,9 +19,10 @@ $ npm install rxrunscript
 import { run } from 'rxrunscript'
 import { take } from 'rxjs/operators'
 
-run('openssl version').pipe(
-  take(1),  // 假定一个 Buffer 就包括了所有输出
-)
+run('openssl version')
+  .pipe(
+    take(1),  // 假定一个 Buffer 就包括了所有输出
+  )
   .subscribe(
     buf => console.log(buf.toString()), 
     err => console.error(err),
@@ -31,17 +32,18 @@ run('openssl version').pipe(
 import { reduce } from 'rxjs/operators'
 
 // win32
-run('tasklist').pipe(
-  // 应该输出多个 Buffer
-  reduce((acc: Buffer[], curr: Buffer) => {
-    acc.push(curr)
-    return acc
-  }, []),
-)
+run('tasklist')
+  .pipe(
+    // 应该输出多个 Buffer
+    reduce((acc: Buffer[], curr: Buffer) => {
+      acc.push(curr)
+      return acc
+    }, []),
+  )
   .subscribe(
     arr => console.log(buf.join('').toString()),
     err => console.error(err),
-    () => console.log('complte'),
+    () => console.log('complete'),
   )
 
 ```
