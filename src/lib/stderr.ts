@@ -16,6 +16,7 @@ export function bindStderrData(
     data$ = fromEvent<Buffer>(stderr, 'data').pipe(
       bufferCount(count),
       take(1),
+      // map(Buffer.concat),   works not!
       map(arr => Buffer.concat(arr)),
     )
   }
