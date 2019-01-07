@@ -1,30 +1,24 @@
-import { ChildProcess } from 'child_process'
+import { SpawnOptions } from 'child_process'
 
 
-export interface MsgPrefix {
+export interface MsgPrefixOpts {
   errPrefix: string
   stderrPrefix: string
 }
 
-export interface HandleBaseOpts {
-  /** cmd script string */
-  msgInfo: string
-  stderrArr: Buffer[]
+export interface RxRunFnArgs
+  extends Array<string | ReadonlyArray<string> | SpawnOptions | null | number | void> {
+  /** command */
+  0: string
+  /** args */
+  1?: ReadonlyArray<string> | null
+  2?: SpawnOptions | null
+  /** maxBufferSize for stderr */
+  3?: number
 }
 
-export interface HandleStderrOpt extends HandleBaseOpts {
-  proc: ChildProcess
-  stderrBufLimit: number
-  stderrPrefix: string
-}
-
-export interface HandleCloseOpts extends HandleBaseOpts {
-  code: number
-  hasNext: boolean
-  stderrPrefix: string
-}
-
-export interface HandleErrOpts {
-  errPrefix: string
-  msgInfo: string
+export interface RunSpawnOpts {
+  command: string
+  runArgs: string[]
+  spawnOpts: SpawnOptions
 }

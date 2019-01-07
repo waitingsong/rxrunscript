@@ -1,6 +1,6 @@
 import { SpawnOptions } from 'child_process'
 
-import { MsgPrefix } from './model'
+import { MsgPrefixOpts } from './model'
 
 
 export const initialSpawnOpts: SpawnOptions = {
@@ -9,7 +9,7 @@ export const initialSpawnOpts: SpawnOptions = {
   stdio: 'pipe',
 }
 
-export const initialMsgPrefixOpts: MsgPrefix = {
+export const initialMsgPrefixOpts: MsgPrefixOpts = {
   errPrefix: 'Run script with error:',
   stderrPrefix: 'Run script with stderr:',
 }
