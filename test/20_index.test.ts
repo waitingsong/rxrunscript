@@ -84,22 +84,21 @@ describe(filename, () => {
 
 describe(filename, () => {
   const file = join(__dirname, 'interval-source.ts')
+  let count = Math.floor(Math.random() * 10)
+  const options = {
+    cwd: __dirname, // ! for test/tsconfig.json
+  }
+
+  if (count < 3) {
+    count = 3
+  }
+  const cmds: RxRunFnArgs[] = [
+    [`ts-node ${file} ${count}`, null, options],
+    [' ts-node ', [`${file} ${count}`], options],
+    ['ts-node ', [file, count.toString()], options],
+  ]
 
   it('Should works running interval-source.ts with random count serially', done => {
-    let count = Math.floor(Math.random() * 10)
-    const options = {
-      cwd: __dirname, // ! for test/tsconfig.json
-    }
-
-    if (count < 3) {
-      count = 3
-    }
-
-    const cmds: RxRunFnArgs[] = [
-      [`ts-node ${file} ${count}`, null, options],
-      [' ts-node ', [`${file} ${count}`], options],
-      ['ts-node ', [file, count.toString()], options],
-    ]
     console.info('start test count serially:', count)
 
     ofrom(cmds).pipe(
@@ -113,20 +112,6 @@ describe(filename, () => {
   })
 
   it('Should works running interval-source.ts with random count parallelly', done => {
-    let count = Math.floor(Math.random() * 10)
-    const options = {
-      cwd: __dirname, // ! for test/tsconfig.json
-    }
-
-    if (count < 3) {
-      count = 3
-    }
-
-    const cmds: RxRunFnArgs[] = [
-      [`ts-node ${file} ${count}`, null, options],
-      [' ts-node ', [`${file} ${count} `], options],
-      ['ts-node ', [file, count.toString()], options],
-    ]
     console.info('start test count parallelly:', count)
 
     ofrom(cmds).pipe(
