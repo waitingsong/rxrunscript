@@ -6,6 +6,7 @@ import { join } from '../shared/index'
 
 import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
 import { MsgPrefixOpts, RunSpawnOpts } from './model'
+import { processOpts } from './prepare'
 import { bindProcClose } from './proc-close'
 import { bindProcError } from './proc-error'
 import { bindStderrData } from './stderr'
@@ -58,52 +59,6 @@ function runSpawn(options: RunSpawnOpts): Observable<ChildProcess> {
   // console.info('runSpanwn opts:', command, runArgs)
   const proc = spawn(command, runArgs, spawnOpts)
   return of(proc)
-}
-
-
-function processOpts(
-  command: string,
-  args?: ReadonlyArray<string> | null,
-  options?: SpawnOptions | null,
-  stderrMaxBufferSize?: number,
-) {
-
-  command = command ? command.trim() : ''
-  /* istanbul ignore else */
-  if (!command) {
-    throw new TypeError('Run command is blank')
-  }
-  command = command.replace(/\\/g, '/').trimLeft()
-
-  const spawnOpts = options ? { ...initialSpawnOpts, ...options } : initialSpawnOpts
-
-  spawnOpts.shell = true
-  /* istanbul ignore else */
-  if (process.platform === 'win32') {
-    spawnOpts.windowsVerbatimArguments = true
-
-    /* istanbul ignore else */
-    if (command.slice(0, 2) === './' || command.slice(0, 3) === '../') {
-      const arr = command.split(' ')
-
-      arr[0] = join(<string> spawnOpts.cwd, arr[0])
-      command = arr.join(' ')
-    }
-  }
-
-  const runArgs = args && args.length ? [...args] : []
-
-  const errScript = `"${command} ${runArgs.join(' ')}"`
-  const maxBufferSize = typeof stderrMaxBufferSize === 'number' && stderrMaxBufferSize > 0
-    ? +stderrMaxBufferSize
-    : 0
-  const runSpawnOpts = { command, runArgs, spawnOpts }
-
-  return {
-    errScript,
-    maxBufferSize,
-    runSpawnOpts,
-  }
 }
 
 
