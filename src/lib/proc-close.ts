@@ -7,7 +7,7 @@ export function bindProcClose(
   proc: ChildProcess,
 ): Observable<null> {
 
-  const stream$ = <Observable<never>> fromEvent<Error>(proc, 'close').pipe(
+  const stream$ = fromEvent<Error>(proc, 'close').pipe(
     mapTo(null),
     take(1),
   )
