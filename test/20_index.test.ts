@@ -91,8 +91,8 @@ describe(filename, () => {
       cwd: __dirname, // ! for test/tsconfig.json
     }
 
-    if (count <= 5) {
-      count = 5
+    if (count < 3) {
+      count = 3
     }
 
     const cmds: RxRunFnArgs[] = [
@@ -118,8 +118,8 @@ describe(filename, () => {
       cwd: __dirname, // ! for test/tsconfig.json
     }
 
-    if (count <= 5) {
-      count = 5
+    if (count < 3) {
+      count = 3
     }
 
     const cmds: RxRunFnArgs[] = [
