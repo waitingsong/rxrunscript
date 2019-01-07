@@ -22,9 +22,20 @@ import {
   resolve as pathResolve,
   sep,
 } from 'path'
-import { defer, from as ofrom, of, Observable } from 'rxjs'
 import {
-  concatMap, last, map, mapTo, mergeMap, scan,
+  defer,
+  from as ofrom,
+  of,
+  throwError,
+  Observable,
+} from 'rxjs'
+import {
+  concatMap,
+  last,
+  map,
+  mapTo,
+  mergeMap,
+  scan,
 } from 'rxjs/operators'
 import { promisify } from 'util'
 
@@ -220,9 +231,11 @@ export interface WriteFileOptions {
   flag?: string
 }
 
-/* istanbul ignore next */
 export function assertNever(x: never): never {
   throw new Error('Assert Never Unexpected object: ' + x)
+}
+export function assertNeverObb(x: never): Observable<never> {
+  return throwError(new Error('Assert Never Unexpected object: ' + x))
 }
 
 /* istanbul ignore next */
@@ -262,3 +275,4 @@ async function _rimraf(path: string): Promise<void> {
     }
   }
 }
+
