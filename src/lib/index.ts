@@ -22,6 +22,7 @@ import { bindStdoutData } from './stdout'
   *   - 0|nagetive: ignore and no error() emitted
   *   - positive: emit error() if up to stderrMaxBufferSize, may output stdout both
   *
+  * @returns Observable<Buffer>
   * @link https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options
   */
 export function run(
