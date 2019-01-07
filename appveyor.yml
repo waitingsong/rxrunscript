@@ -31,7 +31,7 @@ test_script:
   - npm run test
 
 on_success:
-  - npm run cov:coveralls
+  #- npm run cov:coveralls
 
 build: off
 deploy: off
