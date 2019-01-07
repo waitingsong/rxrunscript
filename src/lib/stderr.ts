@@ -12,7 +12,8 @@ export function bindStderrData(
     : 0
   let data$: Observable<Buffer> = NEVER
 
-  if (count >= 0) {
+  /* istanbul ignore else */
+  if (count > 0) {
     data$ = fromEvent<Buffer>(stderr, 'data').pipe(
       bufferCount(count),
       take(1),
