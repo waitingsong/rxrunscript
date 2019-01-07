@@ -2,7 +2,7 @@ import { SpawnOptions } from 'child_process'
 
 import { join } from '../shared/index'
 
-import { initialSpawnOpts } from './config'
+import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
 
 
 export function processOpts(
@@ -12,10 +12,12 @@ export function processOpts(
   stderrMaxBufferSize?: number,
 ) {
 
+  const { errPrefix } = initialMsgPrefixOpts
+
   command = command ? command.trim() : ''
   /* istanbul ignore else */
   if (!command) {
-    throw new TypeError('Run command is blank')
+    throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
   command = command.replace(/\\/g, '/').trimLeft()
 

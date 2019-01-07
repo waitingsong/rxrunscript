@@ -3,7 +3,7 @@ import * as assert from 'power-assert'
 import { from as ofrom, of, Observable } from 'rxjs'
 import { catchError, concatMap, defaultIfEmpty, filter, finalize, map, mergeMap, reduce, tap } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
+import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
 
 
 export const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
@@ -38,7 +38,23 @@ export const opensslCmds: RxRunFnArgs[] = [
 ]
 
 
-export function assertOnOpensslStderr(err: Error, stderrPrefix: string) {
+export function assetRunErr(err: Error, errPrefix: MsgPrefixOpts['errPrefix']) {
+  const msg = err ? err.message : ''
+  if (msg) {
+    if (errPrefix.length) {
+      assert(msg.indexOf(errPrefix) === 0, msg)
+    }
+    else {
+      console.info('assetRunErr() value of errPrefix is blank. Can not do assert')
+    }
+  }
+  else {
+    assert(false, err.message)
+  }
+
+}
+
+export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']) {
   const msg = err ? err.message : ''
   if (msg) {
     if (stderrPrefix.length) {

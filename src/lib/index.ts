@@ -2,9 +2,7 @@ import { spawn, ChildProcess, SpawnOptions } from 'child_process'
 import { merge, of, Observable } from 'rxjs'
 import { catchError, defaultIfEmpty, finalize, mergeMap, takeUntil, tap } from 'rxjs/operators'
 
-import { join } from '../shared/index'
-
-import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
+import { initialMsgPrefixOpts } from './config'
 import { MsgPrefixOpts, RunSpawnOpts } from './model'
 import { processOpts } from './prepare'
 import { bindProcClose } from './proc-close'
