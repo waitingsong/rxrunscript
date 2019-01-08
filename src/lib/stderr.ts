@@ -1,26 +1,36 @@
-import { fromEvent, NEVER, Observable } from 'rxjs'
-import { bufferCount, map, take } from 'rxjs/operators'
+import { fromEvent, of, EMPTY, NEVER, Observable } from 'rxjs'
+import { buffer, filter, map, mergeMap, take, takeUntil } from 'rxjs/operators'
 
 
 export function bindStderrData(
   stderr: NodeJS.ReadableStream,
   bufMaxSize: number,
+  closingNotifier$: Observable<any>,
 ): Observable<Buffer> {
 
-  const count = typeof bufMaxSize === 'number' && bufMaxSize > 0
-    ? bufMaxSize
-    : 0
   let data$: Observable<Buffer> = NEVER
 
   /* istanbul ignore else */
-  if (count > 0) {
+  if (bufMaxSize > 0) {
     data$ = fromEvent<Buffer>(stderr, 'data').pipe(
-      bufferCount(count),
-      take(1),
-      // map(Buffer.concat),   works not!
+      take(bufMaxSize),
+      // tap(buf => console.log('inner stderr', buf.toString())),
+      buffer(closingNotifier$),
+      filter(arr => arr.length > 0),
+      // map(Buffer.concat), // !! works not output empty array
       map(arr => Buffer.concat(arr)),
+      mergeMap(buf => {
+        const buf$ = closingNotifier$.pipe(
+          mergeMap(([code]) => {
+            return code === 0 || code === null ? EMPTY : of(buf)
+          }),
+        )
+        return buf$
+      }),
     )
   }
 
-  return data$
+  return data$.pipe(
+    takeUntil(closingNotifier$),  // for NEVER
+  )
 }

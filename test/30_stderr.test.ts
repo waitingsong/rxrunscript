@@ -2,10 +2,19 @@
 
 import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
-import { from as ofrom, of } from 'rxjs'
-import { catchError, concatMap, defaultIfEmpty, finalize, mergeMap, reduce, take, tap, timeout } from 'rxjs/operators'
+import { from as ofrom, of, NEVER, Observable } from 'rxjs'
+import {
+  bufferTime,
+  catchError,
+  concatMap,
+  finalize,
+  mergeMap,
+  tap,
+  timeout,
+} from 'rxjs/operators'
 
 import { initialMsgPrefixOpts, run } from '../src/index'
+import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
 import {
   basename,
@@ -22,92 +31,77 @@ const { stderrPrefix } = initialMsgPrefixOpts
 describe(filename, () => {
 
   it('Should ignore stderr with negative maxStderrBuffer', done => {
-    const maxErrBuf = -1
-
-    ofrom(opensslCmds).pipe(
+    const stderrMaxBufferSize = -1
+    const ret$ = ofrom(opensslCmds).pipe(
       mergeMap(([cmd, args, opts]) => {
-        return run(cmd, args, opts, maxErrBuf)
+        if (opts) {
+          opts.stderrMaxBufferSize = stderrMaxBufferSize
+        }
+        else {
+          opts = { stderrMaxBufferSize }
+        }
+        return run(cmd, args, opts)
       }),
     )
-      .subscribe(
-        buf => {
-          try {
-            const ret = buf.toString()
-            assert(ret.indexOf(needle) === 0, `result: "${ret}"`)
-          }
-          catch (ex) {
-            assert(false, ex)
-          }
-        },
-        err => {
-          assert(false, err)
-          done()
-        },
-        done,
-    )
+
+    ret$
+      .pipe(
+        bufferTime(1000),
+        tap(buf => {
+          const ret = buf.toString()
+          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+        }),
+        finalize(() => done()),
+      )
+      .subscribe()
   })
 
   it('Should ignore stderr with maxStderrBuffer: 0', done => {
-    const maxErrBuf = 0
-
-    ofrom(opensslCmds).pipe(
-      mergeMap(([cmd, args, opts]) => {
-        return run(cmd, args, opts, maxErrBuf).pipe(
-          tap(buf => {
-            const ret = buf.toString()
-            assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
-          }),
-          catchError((err: Error) => {
-            assert(false, err.message)
-            return of(Buffer.from('catched'))
-          }),
-        )
-      }),
-      finalize(() => done()),
-    ).subscribe()
-  })
-
-
-  it('Should got only stderr with maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-
-    // outpu stderr first during generate key
-    ofrom(opensslCmds).pipe(
-      concatMap(([cmd, args, opts]) => {
-        return run(cmd, args, opts, maxErrBuf).pipe(
-          defaultIfEmpty(Buffer.from('Should got Error but not')),
-          tap(buf => {
-            assert(false, buf.toString())
-          }),
-          catchError((err: Error) => {
-            assertOnOpensslStderr(err, stderrPrefix)
-            return of(Buffer.from('catched'))
-          }),
-        )
-      }),
-      finalize(() => done()),
-    ).subscribe()
-  })
-
-  it('Should got result from stdout with maxStderrBuffer: 10000', done => {
-    const maxErrBuf = 10000
+    const stderrMaxBufferSize = 0
     const ret$ = ofrom(opensslCmds).pipe(
       mergeMap(([cmd, args, opts]) => {
-        return run(cmd, args, opts, maxErrBuf)
+        if (opts) {
+          opts.stderrMaxBufferSize = stderrMaxBufferSize
+        }
+        else {
+          opts = { stderrMaxBufferSize }
+        }
+        return run(cmd, args, opts).pipe()
       }),
     )
 
-    ret$.pipe(
-      reduce((acc: Buffer[], curr: Buffer) => {
-        acc.push(curr)
-        return acc
-      }, []),
-      tap(arr => {
-        const ret = Buffer.concat(arr).toString()
-        assert(ret.indexOf(needle) === 0, `stdout result: "${ret}"`)
+    ret$
+      .pipe(
+        bufferTime(1000),
+        tap(buf => {
+          const ret = buf.toString()
+          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+        }),
+        finalize(() => done()),
+      )
+      .subscribe()
+
+  })
+
+
+  it('Should ignore stderr with maxStderrBuffer default value(200) and exit code 0', done => {
+    const ret$ = ofrom(opensslCmds).pipe(
+      concatMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts)
       }),
-      finalize(() => done()),
-    ).subscribe()
+    )
+
+    ret$
+      .pipe(
+        bufferTime(1000),
+        tap(buf => {
+          const ret = buf.toString()
+          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+        }),
+        finalize(() => done()),
+      )
+      .subscribe()
+
   })
 
 })
@@ -121,68 +115,52 @@ describe(filename, () => {
       shell: true,
     }
 
-    it('with bufMaxSize: 0', done => {
-      const maxErrBuf = 0
-      const random = Math.random().toString()
+    it('Should ignore stderr with nagetive bufMaxSize', done => {
+      const stderrMaxBufferSize = -1
       const ret$ = ofrom(opensslCmds).pipe(
         mergeMap(([cmd, args]) => {
           const proc = spawn(cmd, args ? args : [], spawnOpts)
-          return bindStderrData(proc.stderr, maxErrBuf)
+          return bindStderrData(proc.stderr, stderrMaxBufferSize, NEVER)
         }),
       )
 
       ret$
         .pipe(
-          tap(() => {
-            assert(false, 'Should not output from stderr')
-          }),
-          timeout(3000),
-          catchError(() => of(Buffer.from(random))),
-          tap(buf => {
-            assert(buf.toString() === random, 'Should got error thrown by timeout()')
-          }),
+          assertNoStderrOutput,
           finalize(() => done()),
         )
         .subscribe()
     })
 
-    it('with bufMaxSize: 1', done => {
-      const maxErrBuf = 1
+    it('Should ignore stderr with bufMaxSize: 0', done => {
+      const stderrMaxBufferSize = 0
       const ret$ = ofrom(opensslCmds).pipe(
         mergeMap(([cmd, args]) => {
           const proc = spawn(cmd, args ? args : [], spawnOpts)
-          return bindStderrData(proc.stderr, maxErrBuf)
+          return bindStderrData(proc.stderr, stderrMaxBufferSize, NEVER)
         }),
       )
 
       ret$
         .pipe(
-          timeout(3000),
+          assertNoStderrOutput,
           finalize(() => done()),
         )
         .subscribe()
     })
 
-    it('with bufMaxSize: 10000', done => {
-      const maxErrBuf = 10000
-      const random = Math.random().toString()
+    it('Should not stderr output with default bufMaxSize', done => {
+      const stderrMaxBufferSize = initialRxRunOpts.stderrMaxBufferSize
       const ret$ = ofrom(opensslCmds).pipe(
         mergeMap(([cmd, args]) => {
           const proc = spawn(cmd, args ? args : [], spawnOpts)
-          return bindStderrData(proc.stderr, maxErrBuf)
+          return bindStderrData(proc.stderr, stderrMaxBufferSize, NEVER)
         }),
       )
 
       ret$
         .pipe(
-          tap(() => {
-            assert(false, 'Should not output from stderr')
-          }),
-          timeout(3000),
-          catchError(() => of(Buffer.from(random))),
-          tap(buf => {
-            assert(buf.toString() === random, 'Should got error thrown by timeout()')
-          }),
+          assertNoStderrOutput,
           finalize(() => done()),
         )
         .subscribe()
@@ -190,3 +168,22 @@ describe(filename, () => {
 
   })
 })
+
+
+function assertNoStderrOutput(
+  obb$: Observable<Buffer>,
+): Observable<Buffer> {
+
+  const random = Math.random().toString()
+  const ret$ = obb$.pipe(
+    tap(() => {
+      assert(false, 'Should not output from stderr')
+    }),
+    timeout(3000),
+    catchError(() => of(Buffer.from(random))),
+    tap(buf => {
+      assert(buf.toString() === random, 'Should got error thrown by timeout()')
+    }),
+  )
+  return ret$
+}

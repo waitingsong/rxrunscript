@@ -6,23 +6,31 @@ import { catchError, concatMap, defaultIfEmpty, filter, finalize, map, mergeMap,
 import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
 
 
+
+export const fakeCmds: RxRunFnArgs[] = [
+  ['openssl fake'],
+  ['openssl ', ['fake'] ],
+  ['fakecommand'],
+]
+
+
 export const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
 
 const openssl = 'openssl'
 const genpkey = 'genpkey'
 const genArgs = '-algorithm rsa -aes256 -pass pass:mycapass -pkeyopt rsa_keygen_bits:2048'
 export const opensslCmds: RxRunFnArgs[] = [
-  [`${openssl} ${genpkey} ${genArgs}`, null, null],
+  [`${openssl} ${genpkey} ${genArgs}`, null],
   [`${openssl} ${genpkey} ${genArgs}`, null, {} ],
-  [`${openssl} ${genpkey} ${genArgs}`, [], null],
-  [`${openssl} ${genpkey} ${genArgs}`, [''], null],
+  [`${openssl} ${genpkey} ${genArgs}`, [] ],
+  [`${openssl} ${genpkey} ${genArgs}`, [''] ],
   [`${openssl} ${genpkey} ${genArgs}`],
 
-  [`${openssl} ${genpkey}`, [genArgs], null],
-  [`${openssl} ${genpkey}`, [genArgs, ''], null],
+  [`${openssl} ${genpkey}`, [genArgs] ],
+  [`${openssl} ${genpkey}`, [genArgs, ''] ],
   [`${openssl} ${genpkey}`, [genArgs] ],
 
-  [openssl, [`${genpkey} ${genArgs}`], null],
+  [openssl, [`${genpkey} ${genArgs}`] ],
   [openssl, [`${genpkey} ${genArgs}`], {} ],
   [openssl, [`${genpkey} ${genArgs}`] ],
 
@@ -30,7 +38,7 @@ export const opensslCmds: RxRunFnArgs[] = [
   [openssl, ['', `${genpkey} ${genArgs}`, ''] ],
   [openssl, [' ', `${genpkey} ${genArgs}`, ' '] ],
 
-  [openssl, [genpkey, genArgs], null],
+  [openssl, [genpkey, genArgs] ],
   [openssl, [genpkey, genArgs], {} ],
   [openssl, [genpkey, genArgs] ],
   [openssl, [genpkey, ' ', genArgs] ],
@@ -80,19 +88,17 @@ export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['s
 }
 
 
-export function testStderrPrefix(
+export function testStderrPrefixWithExitError(
   cmdArr: RxRunFnArgs[],
-  maxErrBuf: number,
   stderrPrefix: string,
   done: () => void,
 ): void {
 
   ofrom(cmdArr).pipe(
     concatMap(([cmd, args, opts]) => {
-      return run(cmd, args, opts, maxErrBuf).pipe(
-        defaultIfEmpty(Buffer.from('Should got Error but not')),
+      return run(cmd, args, opts).pipe(
         tap(buf => {
-          assert(false, buf.toString())
+          assert(false, 'Should not got stdout data:' + buf.toString())
         }),
         catchError((err: Error) => {
           assertOnOpensslStderr(err, stderrPrefix)
@@ -109,11 +115,10 @@ export function testIntervalSource(
   cmd: RxRunFnArgs[0],
   args: RxRunFnArgs[1],
   opts: RxRunFnArgs[2],
-  maxErrBuf: RxRunFnArgs[3],
   count: number,
 ): Observable<string[]> {
 
-  return run(cmd, args, opts, maxErrBuf).pipe(
+  return run(cmd, args, opts).pipe(
     map(buf => buf.toString()),
     tap(ret => {
       console.log('got:', ret.trim())

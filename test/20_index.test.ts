@@ -2,7 +2,7 @@
 
 import { SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
-import { from as ofrom, EMPTY } from 'rxjs'
+import { from as ofrom, of, EMPTY } from 'rxjs'
 import { catchError, concatMap, filter, finalize, map, max, mergeMap, reduce, tap } from 'rxjs/operators'
 
 import { run, RxRunFnArgs } from '../src/index'
@@ -11,7 +11,7 @@ import {
   join,
 } from '../src/shared/index'
 
-import { testIntervalSource } from './helper'
+import { opensslCmds, testIntervalSource } from './helper'
 
 
 const filename = basename(__filename)
@@ -27,8 +27,8 @@ describe(filename, () => {
     ]
 
     ofrom(cmds).pipe(
-      mergeMap(([cmd, args, opts, maxErrBuf]) => {
-        return run(cmd, args, opts, maxErrBuf)
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts)
       }),
     )
       .subscribe(
@@ -56,8 +56,8 @@ describe(filename, () => {
       ['openssl ', ['fake'] ],
     ]
     ofrom(cmds).pipe(
-      mergeMap(([cmd, args, opts, maxErrBuf]) => {
-        return run(cmd, args, opts, maxErrBuf)
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts)
       }),
     )
       .subscribe(
@@ -76,6 +76,31 @@ describe(filename, () => {
         },
         done,
     )
+  })
+
+  it.skip('Should throw error with unknown command', done => {
+    const cmds: RxRunFnArgs[] = [
+      ['fakefoo'],
+      ['fakefoo ', ['fake'] ],
+      ['openssl version'],
+      // opensslCmds[0],
+    ]
+    ofrom(cmds).pipe(
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts).pipe(
+          catchError((err: Error) => {
+            console.log(err)
+            return of(Buffer.from(''))
+          }),
+        )
+      }),
+      tap(buf => {
+        console.log(buf.toString())
+      }),
+      finalize(() => {
+        done()
+      }),
+    ).subscribe()
   })
 
 
@@ -102,7 +127,7 @@ describe(filename, () => {
     console.info('start test count serially:', count)
 
     ofrom(cmds).pipe(
-      concatMap(([cmd, args, opts, maxErrBuf]) => testIntervalSource(cmd, args, opts, maxErrBuf, count)),
+      concatMap(([cmd, args, opts]) => testIntervalSource(cmd, args, opts, count)),
       finalize(() => done()),
       catchError((err: Error) => {
         assert(false, err.message)
@@ -115,7 +140,7 @@ describe(filename, () => {
     console.info('start test count parallelly:', count)
 
     ofrom(cmds).pipe(
-      mergeMap(([cmd, args, opts, maxErrBuf]) => testIntervalSource(cmd, args, opts, maxErrBuf, count)),
+      mergeMap(([cmd, args, opts]) => testIntervalSource(cmd, args, opts, count)),
       finalize(() => done()),
       catchError((err: Error) => {
         assert(false, err.message)

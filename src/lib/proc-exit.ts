@@ -5,11 +5,11 @@ import { take } from 'rxjs/operators'
 import { ProcCloseOrExitCodeSignal } from './model'
 
 
-export function bindProcClose(
+export function bindProcExit(
   proc: ChildProcess,
 ): Observable<ProcCloseOrExitCodeSignal> {
 
-  const stream$ = fromEvent<ProcCloseOrExitCodeSignal>(proc, 'close').pipe(
+  const stream$ = fromEvent<ProcCloseOrExitCodeSignal>(proc, 'exit').pipe(
     take(1),
   )
   return stream$

@@ -7,7 +7,7 @@ import {
   join,
 } from '../src/shared/index'
 
-import { opensslCmds, testStderrPrefix } from './helper'
+import { fakeCmds, testStderrPrefixWithExitError } from './helper'
 
 
 const filename = basename(__filename)
@@ -19,53 +19,49 @@ describe(filename, () => {
     initialMsgPrefixOpts.stderrPrefix = stderrPrefixOri
   })
 
-  it('Should stderrPrefix works with blank value and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = ''
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+  describe('Should stderrPrefix works', () => {
 
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
+    it('with blank value', done => {
+      const stderrPrefix = ''
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
+    it('with random value', done => {
+      const stderrPrefix = Math.random() + ''
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
+    it('with random value (lf)', done => {
+      const stderrPrefix = Math.random() + '\n\n\n\n'
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
+    it('with bank value', done => {
+      const stderrPrefix = ''
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
+    it('works with random value', done => {
+      const stderrPrefix = Math.random() + ''
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
+    it('works with random value (lf)', done => {
+      const stderrPrefix = Math.random() + '\n'
+      initialMsgPrefixOpts.stderrPrefix = stderrPrefix
+
+      testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
+    })
+
   })
-
-  it('Should stderrPrefix works with random value and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = Math.random() + ''
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
-
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
-  })
-
-  it('Should stderrPrefix works with random value (lf) and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = Math.random() + '\n\n\n\n'
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
-
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
-  })
-
-
-  it('Should stderrPrefix works with bank value and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = ''
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
-
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
-  })
-
-  it('Should stderrPrefix works with random value and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = Math.random() + ''
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
-
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
-  })
-
-  it('Should stderrPrefix works with random value (lf) and maxStderrBuffer: 1', done => {
-    const maxErrBuf = 1
-    const stderrPrefix = Math.random() + '\n'
-    initialMsgPrefixOpts.stderrPrefix = stderrPrefix
-
-    testStderrPrefix(opensslCmds, maxErrBuf, stderrPrefix, done)
-  })
-
 })
