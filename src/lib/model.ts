@@ -1,7 +1,7 @@
 import { SpawnOptions } from 'child_process'
 
 
-export interface RxRunOpts extends SpawnOptions {
+export interface RxSpawnOpts extends SpawnOptions {
   msgPrefixOpts: MsgPrefixOpts
   /**
    * maxBufferSize for stderr. default: 200
@@ -19,20 +19,14 @@ export interface MsgPrefixOpts {
 }
 
 export interface RxRunFnArgs extends
-  Array<string | ReadonlyArray<string> | Partial<RxRunOpts> | null | void> {
+  Array<string | ReadonlyArray<string> | Partial<RxSpawnOpts> | null | void> {
   /** command */
   0: string
   /** args */
   1?: ReadonlyArray<string> | null
-  2?: Partial<RxRunOpts>
+  2?: Partial<RxSpawnOpts>
 }
 
-/** Inner usage for run spawn() */
-export interface RunSpawnOpts {
-  command: string
-  runArgs: string[]
-  spawnOpts: SpawnOptions
-}
 
 /**
  * @link - https://nodejs.org/api/child_process.html#child_process_event_close
@@ -49,6 +43,6 @@ export interface ProcCloseOrExitCodeSignal extends Array<number | string | null>
 export interface ProcessOpts {
   command: RxRunFnArgs[0]
   args?: RxRunFnArgs[1]
-  rxrunOpts?: RxRunFnArgs[2]
-  initialRxRunOpts: RxRunOpts
+  spawnOpts?: RxRunFnArgs[2]
+  initialRxRunOpts: RxSpawnOpts
 }

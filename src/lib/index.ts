@@ -1,10 +1,10 @@
 import { spawn, ChildProcess } from 'child_process'
-import { of, Observable } from 'rxjs'
-import { mergeMap } from 'rxjs/operators'
+import { of, throwError, Observable } from 'rxjs'
+import { catchError, mergeMap } from 'rxjs/operators'
 
 import { bindEvent } from './bindevent'
-import { initialMsgPrefixOpts, initialRxRunOpts } from './config'
-import { RunSpawnOpts, RxRunFnArgs } from './model'
+import { initialRxRunOpts } from './config'
+import { RxRunFnArgs, RxSpawnOpts } from './model'
 import { processOpts } from './prepare'
 
 
@@ -23,23 +23,32 @@ export function run(
   options?: RxRunFnArgs[2],
 ): Observable<Buffer> {
 
-  const {
-    errScript,
-    stderrMaxBufferSize,
-    runSpawnOpts,
-  } = processOpts({
-    command, args, rxrunOpts: options, initialRxRunOpts,
+  const opts = processOpts({
+    command, args, spawnOpts: options, initialRxRunOpts,
   })
+  const { errScript } = opts
+  const { errPrefix, stderrPrefix } = opts.spawnOpts.msgPrefixOpts
 
-  const proc$ = runSpawn(runSpawnOpts)
+  const proc$ = runSpawn(opts.command, opts.args, opts.spawnOpts)
   const ret$ = proc$.pipe(
     mergeMap(proc => {
       return bindEvent(
         proc,
-        stderrMaxBufferSize,
-        initialMsgPrefixOpts,
-        errScript,
+        opts.spawnOpts.stderrMaxBufferSize,
+        opts.spawnOpts.msgPrefixOpts,
+        opts.errScript,
       )
+    }),
+    catchError((err: Error) => {
+      const msg = err && err.message || ''
+      if (msg && msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
+        err.message = `${errPrefix} ${errScript}\n` + (err && err.message ? err.message : '')
+        throw err
+      }
+      else {
+        const errMsg = `${errPrefix} ${errScript}\nUnknown error`
+        throw new Error(errMsg)
+      }
     }),
   )
 
@@ -47,11 +56,18 @@ export function run(
 }
 
 
-function runSpawn(options: RunSpawnOpts): Observable<ChildProcess> {
-  const { command, runArgs, spawnOpts } = options
-  // console.info('runSpanwn opts:', command, runArgs)
-  const proc = spawn(command, runArgs, spawnOpts)
-  return of(proc)
+function runSpawn(
+  command: string,
+  runArgs: string[],
+  spawnOpts: RxSpawnOpts,
+): Observable<ChildProcess> {
+  try {
+    const proc = spawn(command, runArgs, spawnOpts)
+    return of(proc)
+  }
+  catch (ex) {
+    return throwError(ex)
+  }
 }
 
 

@@ -1,6 +1,6 @@
 import { SpawnOptions } from 'child_process'
 
-import { MsgPrefixOpts, RxRunOpts } from './model'
+import { MsgPrefixOpts, RxSpawnOpts } from './model'
 
 
 export const initialSpawnOpts: SpawnOptions = {
@@ -14,7 +14,7 @@ export const initialMsgPrefixOpts: MsgPrefixOpts = {
   stderrPrefix: 'Run script with stderr:',
 }
 
-export const initialRxRunOpts: RxRunOpts = {
+export const initialRxRunOpts: RxSpawnOpts = {
   msgPrefixOpts: initialMsgPrefixOpts,
   stderrMaxBufferSize: 200,
 }

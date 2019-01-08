@@ -1,9 +1,8 @@
 /// <reference types="mocha" />
 
-import { SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, EMPTY } from 'rxjs'
-import { catchError, concatMap, filter, finalize, map, max, mergeMap, reduce, tap } from 'rxjs/operators'
+import { catchError, concatMap, finalize, mergeMap, tap } from 'rxjs/operators'
 
 import { run, RxRunFnArgs } from '../src/index'
 import {
@@ -78,24 +77,24 @@ describe(filename, () => {
     )
   })
 
-  it.skip('Should throw error with unknown command', done => {
+  it('Should throw error with unknown command', done => {
     const cmds: RxRunFnArgs[] = [
       ['fakefoo'],
       ['fakefoo ', ['fake'] ],
-      ['openssl version'],
+      // ['openssl version'],
       // opensslCmds[0],
     ]
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
+          tap(buf => {
+            assert(false, 'Should not got data from stdout' + buf.toString())
+          }),
           catchError((err: Error) => {
             console.log(err)
             return of(Buffer.from(''))
           }),
         )
-      }),
-      tap(buf => {
-        console.log(buf.toString())
       }),
       finalize(() => {
         done()
@@ -124,6 +123,10 @@ describe(filename, () => {
   ]
 
   it('Should works running interval-source.ts with random count serially', done => {
+    if (process.platform === 'win32') {
+      console.info('skip test under win32')
+      return done()
+    }
     console.info('start test count serially:', count)
 
     ofrom(cmds).pipe(
@@ -137,6 +140,10 @@ describe(filename, () => {
   })
 
   it('Should works running interval-source.ts with random count parallelly', done => {
+    if (process.platform === 'win32') {
+      console.info('skip test under win32')
+      return done()
+    }
     console.info('start test count parallelly:', count)
 
     ofrom(cmds).pipe(

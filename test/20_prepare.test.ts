@@ -13,7 +13,7 @@ import {
   join,
 } from '../src/shared/index'
 
-import { assetRunErr } from './helper'
+import { assetRunError } from './helper'
 
 
 
@@ -44,7 +44,7 @@ describe(filename, () => {
             assert(false, 'Should throw error, but not')
           }
           catch (ex) {
-            assetRunErr(ex, initialMsgPrefixOpts.errPrefix)
+            assetRunError(ex, initialMsgPrefixOpts.errPrefix)
             return Buffer.from('')
           }
         }),
@@ -69,7 +69,7 @@ describe(filename, () => {
             assert(false, 'Should throw error, but not')
           }
           catch (ex) {
-            assetRunErr(ex, initialMsgPrefixOpts.errPrefix)
+            assetRunError(ex, initialMsgPrefixOpts.errPrefix)
             return Buffer.from('')
           }
         }),

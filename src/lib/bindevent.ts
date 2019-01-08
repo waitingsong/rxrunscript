@@ -1,7 +1,6 @@
 import { ChildProcess } from 'child_process'
 import { merge, race, Observable } from 'rxjs'
 import {
-  catchError,
   finalize,
   shareReplay,
   tap,
@@ -22,7 +21,7 @@ export function bindEvent(
   script: string, // for throw error
 ): Observable<Buffer> {
 
-  const { errPrefix, stderrPrefix } = msgPrefixOpts
+  const { stderrPrefix } = msgPrefixOpts
 
   const close$ = bindProcClose(proc)
   const exit$ = bindProcExit(proc)
@@ -34,12 +33,7 @@ export function bindEvent(
   )
 
   const stdout$ = bindStdoutData(proc.stdout, closeOrExit$)
-  const error$ = bindProcError(proc, closeOrExit$).pipe(
-    catchError((err: Error) => {
-      err.message = `${errPrefix} ${script}\n` + (err && err.message ? err.message : '')
-      throw err
-    }),
-  )
+  const error$ = bindProcError(proc, closeOrExit$)
   const stderr$ = bindStderrData(proc.stderr, stderrMaxBufferSize, closeOrExit$).pipe(
     tap(buf => {
       const msg = buf.toString()
@@ -52,7 +46,6 @@ export function bindEvent(
     stderr$,
     error$,
   ).pipe(
-    // defaultIfEmpty(Buffer.from('foooo\0')),
     finalize(() => {
       // sub process may not stop
       // link: https://nodejs.org/api/child_process.html#child_process_subprocess_kill_signal

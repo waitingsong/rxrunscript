@@ -46,7 +46,7 @@ export const opensslCmds: RxRunFnArgs[] = [
 ]
 
 
-export function assetRunErr(err: Error, errPrefix: MsgPrefixOpts['errPrefix']) {
+export function assetRunError(err: Error, errPrefix: MsgPrefixOpts['errPrefix']) {
   const msg = err ? err.message : ''
   if (msg) {
     if (errPrefix.length) {
@@ -57,10 +57,10 @@ export function assetRunErr(err: Error, errPrefix: MsgPrefixOpts['errPrefix']) {
     }
   }
   else {
-    assert(false, err.message)
+    assert(false, 'Catched Error without err.message')
   }
-
 }
+
 
 export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']) {
   const msg = err ? err.message : ''
@@ -83,7 +83,7 @@ export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['s
     }
   }
   else {
-    assert(false, err.message)
+    assert(false, 'Catched Error without err.message')
   }
 }
 
