@@ -31,23 +31,6 @@ const filename = basename(__filename)
 
 describe(filename, () => {
 
-  it('Should ignore stderr with negative maxStderrBuffer', done => {
-    const stderrMaxBufferSize = -1
-    const ret$ = ofrom(opensslCmds).pipe(
-      mergeMap(([cmd, args, options]) => {
-        const opts: Partial<RxSpawnOpts> = { ...options }
-        opts.stderrMaxBufferSize = stderrMaxBufferSize
-        return assertWithStderrOutput(cmd, args, options)
-      }),
-    )
-
-    ret$
-      .pipe(
-        finalize(() => done()),
-      )
-      .subscribe()
-  })
-
   it('Should ignore stderr with maxStderrBuffer: 0', done => {
     const stderrMaxBufferSize = 0
     const ret$ = ofrom(opensslCmds).pipe(
@@ -58,16 +41,10 @@ describe(filename, () => {
       }),
     )
 
-    ret$
-      .pipe(
-        finalize(() => done()),
-      )
-      .subscribe()
-
+    ret$.pipe(finalize(() => done())).subscribe()
   })
 
-
-  it('Should ignore stderr with maxStderrBuffer default value(200) and exit code 0', done => {
+  it('Should no stderr output with maxStderrBuffer default value(200) and exit code 0', done => {
     const ret$ = ofrom(opensslCmds).pipe(
       concatMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
@@ -75,13 +52,22 @@ describe(filename, () => {
       }),
     )
 
-    ret$
-      .pipe(
-        finalize(() => done()),
-      )
-      .subscribe()
-
+    ret$.pipe(finalize(() => done())).subscribe()
   })
+
+  it('Should no stderr output with negative maxStderrBuffer (will use default value)', done => {
+    const stderrMaxBufferSize = -1
+    const ret$ = ofrom(opensslCmds).pipe(
+      mergeMap(([cmd, args, options]) => {
+        const opts: Partial<RxSpawnOpts> = { ...options }
+        opts.stderrMaxBufferSize = stderrMaxBufferSize
+        return assertWithStderrOutput(cmd, args, options)
+      }),
+    )
+
+    ret$.pipe(finalize(() => done())).subscribe()
+  })
+
 
 })
 
