@@ -15,7 +15,7 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
+import { RxRunFnArgs, RxSpawnOpts } from '../src/index'
 import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
 import {
@@ -23,7 +23,11 @@ import {
   join,
 } from '../src/shared/index'
 
-import { fakeCmds, needle, opensslCmds } from './helper'
+import {
+  assertOpensslWithStderrOutput,
+  fakeCmds,
+  opensslCmds,
+} from './helper'
 
 
 const filename = basename(__filename)
@@ -352,22 +356,3 @@ function assertNoStderrOutput(
   return ret$
 }
 
-
-function assertOpensslWithStderrOutput(
-  cmd: RxRunFnArgs[0],
-  args?: RxRunFnArgs[1] | null,
-  opts?: RxRunFnArgs[2] | null,
-) {
-
-  return run(cmd, args, opts).pipe(
-    reduce((acc: Buffer[], curr: Buffer) => {
-      acc.push(curr)
-      return acc
-    }, []),
-    map(arr => Buffer.concat(arr)),
-    tap(buf => {
-      const ret = buf.toString()
-      assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
-    }),
-  )
-}

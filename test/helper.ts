@@ -180,3 +180,22 @@ export function testIntervalSource(
     }),
   )
 }
+
+export function assertOpensslWithStderrOutput(
+  cmd: RxRunFnArgs[0],
+  args?: RxRunFnArgs[1] | null,
+  opts?: RxRunFnArgs[2] | null,
+) {
+
+  return run(cmd, args, opts).pipe(
+    reduce((acc: Buffer[], curr: Buffer) => {
+      acc.push(curr)
+      return acc
+    }, []),
+    map(arr => Buffer.concat(arr)),
+    tap(buf => {
+      const ret = buf.toString()
+      assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+    }),
+  )
+}
