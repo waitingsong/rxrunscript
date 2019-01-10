@@ -1,36 +1,49 @@
-import { fromEvent, of, EMPTY, NEVER, Observable } from 'rxjs'
-import { buffer, filter, map, mergeMap, take, takeUntil } from 'rxjs/operators'
+import { fromEvent, NEVER, Observable } from 'rxjs'
+import {
+  buffer,
+  filter,
+  map,
+  shareReplay,
+  skipUntil,
+  take,
+  takeUntil,
+} from 'rxjs/operators'
 
 
 export function bindStderrData(
   stderr: NodeJS.ReadableStream,
+  takeUntilNotifier$: Observable<any>,
+  skipUntilNofifier$: Observable<any>,
   bufMaxSize: number,
-  closingNotifier$: Observable<any>,
 ): Observable<Buffer> {
 
-  let data$: Observable<Buffer> = NEVER
-
-  /* istanbul ignore else */
-  if (bufMaxSize > 0) {
-    data$ = fromEvent<Buffer>(stderr, 'data').pipe(
-      take(bufMaxSize),
-      // tap(buf => console.log('inner stderr', buf.toString())),
-      buffer(closingNotifier$),
-      filter(arr => arr.length > 0),
-      // map(Buffer.concat), // !! works not output empty array
-      map(arr => Buffer.concat(arr)),
-      mergeMap(buf => {
-        const buf$ = closingNotifier$.pipe(
-          mergeMap(([code]) => {
-            return code === 0 || code === null ? EMPTY : of(buf)
-          }),
-        )
-        return buf$
-      }),
-    )
-  }
-
-  return data$.pipe(
-    takeUntil(closingNotifier$),  // for NEVER
+  const take$ = takeUntilNotifier$.pipe(
+    take(1),
+    shareReplay(),
   )
+  const skip$ = skipUntilNofifier$.pipe(
+    take(1),
+    shareReplay(1),
+  )
+
+  const event$ = bufMaxSize > 0
+    ? fromEvent<Buffer>(stderr, 'data')
+    : NEVER
+
+  const data$ = event$.pipe(
+    takeUntil(take$),
+    take(bufMaxSize),
+    // tap(buf => console.log('inner stderr1', buf.toString(), buf.byteLength)),
+    buffer(take$),
+    // buffer() may emit blank data, so filter
+    filter(arr => arr && arr.length > 0 ? true : false),
+    // map(Buffer.concat), // !! works not output empty array
+    map(arr => Buffer.concat(arr)),
+  )
+
+  const ret$ = data$.pipe(
+    skipUntil<Buffer>(skip$),
+  )
+
+  return ret$
 }

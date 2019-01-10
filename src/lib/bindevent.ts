@@ -1,7 +1,8 @@
 import { ChildProcess } from 'child_process'
-import { merge, race, Observable } from 'rxjs'
+import { merge, of, race, EMPTY, Observable } from 'rxjs'
 import {
   finalize,
+  mergeMap,
   shareReplay,
   tap,
  } from 'rxjs/operators'
@@ -34,7 +35,19 @@ export function bindEvent(
 
   const stdout$ = bindStdoutData(proc.stdout, closeOrExit$)
   const error$ = bindProcError(proc, closeOrExit$)
-  const stderr$ = bindStderrData(proc.stderr, stderrMaxBufferSize, closeOrExit$).pipe(
+
+  const skipUntilNotifier$ = closeOrExit$.pipe(
+    mergeMap(([code]) => {
+      return code === 0 || code === null ? EMPTY : of(void 0)
+    }),
+  )
+
+  const stderr$ = bindStderrData(
+    proc.stderr,
+    closeOrExit$,
+    skipUntilNotifier$,
+    stderrMaxBufferSize,
+  ).pipe(
     tap(buf => {
       const msg = buf.toString()
       throw new Error(`${stderrPrefix} ${script}\n${msg}`)

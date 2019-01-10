@@ -87,8 +87,49 @@ export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['s
   }
 }
 
+export function assertStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']) {
+  const msg = err ? err.message : ''
+  if (msg) {
+    if (stderrPrefix.length) {
+      const msg1 = msg.slice(0, stderrPrefix.length)
+      assert(msg1 === stderrPrefix, msg)
+    }
+    else {
+      const arr = msg.split(/\r\n|\n|\r/)
+      assert(arr.length >= 1)
+      console.info('assertStderr() stderrPrefix value blank. Can not assert')
+    }
+  }
+  else {
+    assert(false, 'Catched Error without err.message')
+  }
+}
+
 
 export function testStderrPrefixWithExitError(
+  cmdArr: RxRunFnArgs[],
+  stderrPrefix: string,
+  done: () => void,
+): void {
+
+  ofrom(cmdArr).pipe(
+    concatMap(([cmd, args, opts]) => {
+      return run(cmd, args, opts).pipe(
+        tap(buf => {
+          assert(false, 'Should not got stdout data:' + buf.toString())
+        }),
+        catchError((err: Error) => {
+          assertStderr(err, stderrPrefix)
+          return of(Buffer.from('catched'))
+        }),
+      )
+    }),
+    finalize(() => done()),
+  ).subscribe()
+}
+
+
+export function testOpensslStderrPrefixWithExitError(
   cmdArr: RxRunFnArgs[],
   stderrPrefix: string,
   done: () => void,
@@ -109,7 +150,6 @@ export function testStderrPrefixWithExitError(
     finalize(() => done()),
   ).subscribe()
 }
-
 
 export function testIntervalSource(
   cmd: RxRunFnArgs[0],

@@ -1,6 +1,6 @@
 import { ChildProcess } from 'child_process'
 import { fromEvent, Observable } from 'rxjs'
-import { take, takeUntil, tap } from 'rxjs/operators'
+import { take, takeUntil } from 'rxjs/operators'
 
 
 export function bindProcError(
@@ -10,9 +10,9 @@ export function bindProcError(
 
   const stream$ = <Observable<never>> fromEvent<Error>(proc, 'error').pipe(
     take(1),
-    tap(err => {
-      throw err
-    }),
+    // tap(err => {
+    //   throw err
+    // }),
     takeUntil(closingNotifier$),
   )
   return stream$

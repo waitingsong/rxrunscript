@@ -41,8 +41,11 @@ export function run(
     }),
     catchError((err: Error) => {
       const msg = err && err.message || ''
-      if (msg && msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
-        err.message = `${errPrefix} ${errScript}\n` + (err && err.message ? err.message : '')
+      /* istanbul ignore else */
+      if (msg) {
+        if (msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
+          err.message = `${errPrefix} ${errScript}\n` + msg
+        }
         throw err
       }
       else {

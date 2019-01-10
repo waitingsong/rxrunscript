@@ -1,5 +1,6 @@
 /// <reference types="mocha" />
 
+import { sep } from 'path'
 import * as assert from 'power-assert'
 import { from as ofrom, of, EMPTY } from 'rxjs'
 import { catchError, concatMap, finalize, mergeMap, tap } from 'rxjs/operators'
@@ -91,7 +92,6 @@ describe(filename, () => {
             assert(false, 'Should not got data from stdout' + buf.toString())
           }),
           catchError((err: Error) => {
-            console.log(err)
             return of(Buffer.from(''))
           }),
         )
@@ -156,5 +156,51 @@ describe(filename, () => {
     ).subscribe()
   })
 
+})
+
+
+describe(filename, () => {
+  const file = 'prepare.cmd'
+  const appDirName = __dirname.split(sep).slice(-2, -1)[0]
+
+  it(`Should running ${file} works`, done => {
+    assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
+
+    const cmds: RxRunFnArgs[] = [
+      [`./test/${file} ${ Math.random().toString() } `],
+
+      [`./test/${file}`, [Math.random().toString()] ],
+      [`./test/${file}`, [Math.random().toString(), '--'] ],
+      [join('./test', file), [Math.random().toString()] ],
+      [join('./test', file), [Math.random().toString(), '--'] ],
+
+      [`../${appDirName}/test/${file}`, [Math.random().toString()] ],
+      [join('..', appDirName, 'test', file), [Math.random().toString()] ],
+    ]
+    const ret$ = ofrom(cmds).pipe(
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts).pipe(
+          tap(buf => {
+            const ret = buf.toString().trim()
+            assert(ret && ret.includes(file))
+            if (args && args[0]) {
+              assert(ret.includes(<string> args[0]))
+            }
+          }),
+        )
+      }),
+      finalize(() => {
+        done()
+      }),
+    )
+
+
+    if (process.platform === 'win32') {
+      ret$.subscribe()
+    }
+    else {
+      done()
+    }
+  })
 
 })

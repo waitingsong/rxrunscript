@@ -1,5 +1,5 @@
 # RxRunScript
-Run shell script in Node.js child process, Output `Observable<Buffer>`
+Run shell script or command in Node.js child process, Output `Observable<Buffer>`
 
 [![Version](https://img.shields.io/npm/v/rxrunscript.svg)](https://www.npmjs.com/package/rxrunscript)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -35,16 +35,21 @@ import { reduce } from 'rxjs/operators'
 // win32
 run('tasklist')
   .pipe(
-    // should output Buffers
     reduce((acc: Buffer[], curr: Buffer) => {
       acc.push(curr)
       return acc
     }, []),
   )
   .subscribe(
-    arr => console.log(buf.join('').toString()),
+    arr => console.log(Buffer.concat(arr).toString()),
     err => console.error(err),
     () => console.log('complete'),
+  )
+
+// run cmd file
+run('./test/prepare.cmd')
+  .subscribe(
+    arr => console.log(buf.toString()),
   )
 
 ```

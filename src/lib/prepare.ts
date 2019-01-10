@@ -50,7 +50,7 @@ function processSpawnOpts(
 function processCommand(
   command: string,
   errPrefix: string,
-  rxrunOpts: RxSpawnOpts,
+  spawnOpts: RxSpawnOpts,
 ): string {
 
   let cmd = command ? command.trim() : ''
@@ -58,7 +58,8 @@ function processCommand(
   if (!cmd) {
     throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
-  cmd = cmd.replace(/\\/g, '/').trimLeft()
+  // cmd = cmd.replace(/\\/g, '/').trimLeft()
+  cmd = cmd.trimLeft()
 
   /* istanbul ignore else */
   if (process.platform === 'win32') {
@@ -66,7 +67,7 @@ function processCommand(
     if (cmd.slice(0, 2) === './' || cmd.slice(0, 3) === '../') {
       const arr = cmd.split(' ')
 
-      arr[0] = join(<string> rxrunOpts.cwd, arr[0])
+      arr[0] = join(<string> spawnOpts.cwd, arr[0])
       cmd = arr.join(' ')
     }
   }

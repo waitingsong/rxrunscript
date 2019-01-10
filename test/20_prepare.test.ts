@@ -1,12 +1,11 @@
 /// <reference types="mocha" />
 
-import { SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, EMPTY } from 'rxjs'
-import { catchError, concatMap, filter, finalize, map, max, merge, mergeMap, reduce, tap } from 'rxjs/operators'
+import { finalize, map, mergeMap, tap } from 'rxjs/operators'
 
-import { initialMsgPrefixOpts, run, ProcessOpts, RxRunFnArgs } from '../src/index'
-import { initialRxRunOpts } from '../src/lib/config'
+import { ProcessOpts } from '../src/index'
+import { initialMsgPrefixOpts, initialRxRunOpts } from '../src/lib/config'
 import { processOpts } from '../src/lib/prepare'
 import {
   basename,
@@ -79,3 +78,4 @@ describe(filename, () => {
 
   })
 })
+

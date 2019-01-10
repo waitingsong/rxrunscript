@@ -10,7 +10,8 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { initialMsgPrefixOpts, run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
+import { run, RxSpawnOpts } from '../src/index'
+import { initialMsgPrefixOpts } from '../src/lib/config'
 import {
   basename,
   join,
@@ -43,12 +44,7 @@ describe(filename, () => {
       }),
     )
 
-    ret$
-      .pipe(
-        finalize(() => done()),
-      )
-      .subscribe()
+    ret$.pipe(finalize(() => done())).subscribe()
   })
-
 
 })

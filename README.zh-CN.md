@@ -1,5 +1,5 @@
 # RxRunScript
-调用 Node.js child process 执行脚本, 输出 `Observable<Buffer>` 可观察对象
+调用 Node.js child process 执行脚本或者命令行, 输出 `Observable<Buffer>` 可观察对象
 
 [![Version](https://img.shields.io/npm/v/rxrunscript.svg)](https://www.npmjs.com/package/rxrunscript)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -41,11 +41,16 @@ run('tasklist')
     }, []),
   )
   .subscribe(
-    arr => console.log(buf.join('').toString()),
+    arr => console.log(Buffer.concat(arr).toString()),
     err => console.error(err),
     () => console.log('complete'),
   )
 
+// 运行 cmd 脚本
+run('./test/prepare.cmd')
+  .subscribe(
+    arr => console.log(buf.toString()),
+  )
 ```
 
 

@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 
 
-import { initialMsgPrefixOpts, RxRunFnArgs } from '../src/index'
+import { initialMsgPrefixOpts } from '../src/lib/config'
 import {
   basename,
   join,

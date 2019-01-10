@@ -4,11 +4,11 @@ import { takeUntil } from 'rxjs/operators'
 
 export function bindStdoutData(
   stdout: NodeJS.ReadableStream,
-  closingNotifier$: Observable<any>,
+  takeUntilNotifier$: Observable<any>,
 ): Observable<Buffer> {
 
   const data$ = fromEvent<Buffer>(stdout, 'data').pipe(
-    takeUntil(closingNotifier$),
+    takeUntil(takeUntilNotifier$),
     // tap(buf => console.info('stdout:', buf.toString())),
   )
   return data$
