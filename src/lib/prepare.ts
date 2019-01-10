@@ -1,7 +1,7 @@
 import { join } from '../shared/index'
 
 import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
-import { ProcessOpts, RxSpawnOpts } from './model'
+import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './model'
 
 
 export function processOpts(options: ProcessOpts) {
@@ -26,7 +26,7 @@ export function processOpts(options: ProcessOpts) {
 
 function processSpawnOpts(
   defaultRxrunOpts: RxSpawnOpts,
-  options?: Partial<RxSpawnOpts>,
+  options?: RxRunFnArgs[2],
 ): RxSpawnOpts {
 
   const opts = <RxSpawnOpts> (options ? { ...initialSpawnOpts, ...options } : initialSpawnOpts)
