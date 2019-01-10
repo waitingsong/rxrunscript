@@ -78,29 +78,11 @@ describe(filename, () => {
 
 describe(filename, () => {
 
-  describe('Should got bindStderrData() works', () => {
+  describe('Should bindStderrData() works', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
     }
-
-    it('Should ignore stderr with nagetive bufMaxSize', done => {
-      const stderrMaxBufferSize = -1
-      const skipUntilNotifier$ = of(void 0)
-      const ret$ = ofrom(opensslCmds).pipe(
-        mergeMap(([cmd, args]) => {
-          const proc = spawn(cmd, args ? args : [], spawnOpts)
-          return bindStderrData(proc.stderr, NEVER, skipUntilNotifier$, stderrMaxBufferSize)
-        }),
-      )
-
-      ret$
-        .pipe(
-          assertNoStderrOutput,
-          finalize(() => done()),
-        )
-        .subscribe()
-    })
 
     it('Should ignore stderr with bufMaxSize: 0', done => {
       const stderrMaxBufferSize = 0
@@ -120,7 +102,7 @@ describe(filename, () => {
         .subscribe()
     })
 
-    it('Should not stderr output with default bufMaxSize', done => {
+    it('Should no stderr output with default bufMaxSize', done => {
       const stderrMaxBufferSize = initialRxRunOpts.stderrMaxBufferSize
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(opensslCmds).pipe(
@@ -137,6 +119,25 @@ describe(filename, () => {
         )
         .subscribe()
     })
+
+    it('Should no stderr output with nagetive bufMaxSize (use default value)', done => {
+      const stderrMaxBufferSize = -1
+      const skipUntilNotifier$ = of(void 0)
+      const ret$ = ofrom(opensslCmds).pipe(
+        mergeMap(([cmd, args]) => {
+          const proc = spawn(cmd, args ? args : [], spawnOpts)
+          return bindStderrData(proc.stderr, NEVER, skipUntilNotifier$, stderrMaxBufferSize)
+        }),
+      )
+
+      ret$
+        .pipe(
+          assertNoStderrOutput,
+          finalize(() => done()),
+        )
+        .subscribe()
+    })
+
 
   })
 })
