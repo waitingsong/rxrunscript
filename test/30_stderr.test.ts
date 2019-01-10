@@ -37,7 +37,7 @@ describe(filename, () => {
       mergeMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
         opts.stderrMaxBufferSize = stderrMaxBufferSize
-        return assertWithStderrOutput(cmd, args, options)
+        return assertOpensslWithStderrOutput(cmd, args, options)
       }),
     )
 
@@ -48,7 +48,7 @@ describe(filename, () => {
     const ret$ = ofrom(opensslCmds).pipe(
       concatMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
-        return assertWithStderrOutput(cmd, args, options)
+        return assertOpensslWithStderrOutput(cmd, args, options)
       }),
     )
 
@@ -61,7 +61,7 @@ describe(filename, () => {
       mergeMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
         opts.stderrMaxBufferSize = stderrMaxBufferSize
-        return assertWithStderrOutput(cmd, args, options)
+        return assertOpensslWithStderrOutput(cmd, args, options)
       }),
     )
 
@@ -353,7 +353,7 @@ function assertNoStderrOutput(
 }
 
 
-function assertWithStderrOutput(
+function assertOpensslWithStderrOutput(
   cmd: RxRunFnArgs[0],
   args?: RxRunFnArgs[1] | null,
   opts?: RxRunFnArgs[2] | null,
