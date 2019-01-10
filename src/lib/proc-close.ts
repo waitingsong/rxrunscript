@@ -10,6 +10,7 @@ export function bindProcClose(
 ): Observable<ProcCloseOrExitCodeSignal> {
 
   const stream$ = fromEvent<ProcCloseOrExitCodeSignal>(proc, 'close').pipe(
+    // tap(val => console.log('bindProcClsoe data:', val)),
     take(1),
   )
   return stream$

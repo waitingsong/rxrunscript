@@ -1,5 +1,5 @@
 import { fromEvent, Observable } from 'rxjs'
-import { takeUntil } from 'rxjs/operators'
+import { shareReplay, take, takeUntil } from 'rxjs/operators'
 
 
 export function bindStdoutData(
@@ -7,9 +7,11 @@ export function bindStdoutData(
   takeUntilNotifier$: Observable<any>,
 ): Observable<Buffer> {
 
+  const take$ = takeUntilNotifier$.pipe(take(1), shareReplay())
   const data$ = fromEvent<Buffer>(stdout, 'data').pipe(
-    takeUntil(takeUntilNotifier$),
     // tap(buf => console.info('stdout:', buf.toString())),
+    takeUntil(take$),
   )
+
   return data$
 }

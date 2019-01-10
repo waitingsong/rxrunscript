@@ -33,7 +33,7 @@ export function bindStderrData(
   const data$ = event$.pipe(
     takeUntil(take$),
     take(bufMaxSize),
-    // tap(buf => console.log('inner stderr1', buf.toString(), buf.byteLength)),
+    // tap(buf => console.info('inner stderr1', buf.toString(), buf.byteLength)),
     buffer(take$),
     // buffer() may emit blank data, so filter
     filter(arr => arr && arr.length > 0 ? true : false),

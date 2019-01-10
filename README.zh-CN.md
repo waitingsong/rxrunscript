@@ -28,6 +28,11 @@ run('openssl version')
     err => console.error(err),
   ) 
 
+// exec shell file
+run('./test/openssl.sh')
+  .subscribe(
+    arr => console.log(buf.toString()),
+  )
 
 import { reduce } from 'rxjs/operators'
 

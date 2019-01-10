@@ -40,18 +40,11 @@ export function run(
       )
     }),
     catchError((err: Error) => {
-      const msg = err && err.message || ''
-      /* istanbul ignore else */
-      if (msg) {
-        if (msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
-          err.message = `${errPrefix} ${errScript}\n` + msg
-        }
-        throw err
+      const msg = err.message
+      if (msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
+        err.message = `${errPrefix} ${errScript}\n` + msg
       }
-      else {
-        const errMsg = `${errPrefix} ${errScript}\nUnknown error`
-        throw new Error(errMsg)
-      }
+      throw err
     }),
   )
 

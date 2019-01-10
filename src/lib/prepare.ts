@@ -14,7 +14,9 @@ export function processOpts(options: ProcessOpts) {
     spawnOpts,
   )
   const runArgs = args && args.length ? [...args] : []
-  const errScript = `"${cmd} ${runArgs.join(' ')}"`
+  const errScript = runArgs.length
+    ? `"${cmd} ${runArgs.join(' ')}"`
+    : `"${cmd}"`
 
   return {
     command: cmd,
@@ -58,18 +60,11 @@ function processCommand(
   if (!cmd) {
     throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
-  // cmd = cmd.replace(/\\/g, '/').trimLeft()
-  cmd = cmd.trimLeft()
 
+  const cmdLead = cmd.slice(0, 3).replace(/\\/g, '/')
   /* istanbul ignore else */
-  if (process.platform === 'win32') {
-    /* istanbul ignore else */
-    if (cmd.slice(0, 2) === './' || cmd.slice(0, 3) === '../') {
-      const arr = cmd.split(' ')
-
-      arr[0] = join(<string> spawnOpts.cwd, arr[0])
-      cmd = arr.join(' ')
-    }
+  if (spawnOpts.cwd && (cmdLead === '../' || cmdLead.slice(0, 2) === './')) {
+    cmd = join(spawnOpts.cwd, cmd)
   }
 
   /* istanbul ignore else */
