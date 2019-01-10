@@ -194,8 +194,10 @@ export function assertOpensslWithStderrOutput(
     }, []),
     map(arr => Buffer.concat(arr)),
     tap(buf => {
-      const ret = buf.toString()
-      assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+      const ret = buf.toString().trim()
+      assert(
+        ret.indexOf(needle) === 0,
+        `Command: ${cmd}\nGot result: "${ret}"`)
     }),
   )
 }
