@@ -1,10 +1,9 @@
 import { SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, Observable } from 'rxjs'
-import { catchError, concatMap, defaultIfEmpty, filter, finalize, map, mergeMap, reduce, tap } from 'rxjs/operators'
+import { catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap } from 'rxjs/operators'
 
 import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
-
 
 
 export const fakeCmds: RxRunFnArgs[] = [
@@ -12,7 +11,6 @@ export const fakeCmds: RxRunFnArgs[] = [
   ['openssl ', ['fake'] ],
   ['fakecommand'],
 ]
-
 
 export const needle = '-----BEGIN ENCRYPTED PRIVATE KEY-----'
 
