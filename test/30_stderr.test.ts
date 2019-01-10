@@ -37,23 +37,12 @@ describe(filename, () => {
       mergeMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
         opts.stderrMaxBufferSize = stderrMaxBufferSize
-
-        return run(cmd, args, opts).pipe(
-          reduce((acc: Buffer[], curr: Buffer) => {
-            acc.push(curr)
-            return acc
-          }, []),
-          map(arr => Buffer.concat(arr)),
-        )
+        return assertWithStderrOutput(cmd, args, options)
       }),
     )
 
     ret$
       .pipe(
-        tap(buf => {
-          const ret = buf.toString()
-          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
-        }),
         finalize(() => done()),
       )
       .subscribe()
@@ -65,23 +54,12 @@ describe(filename, () => {
       mergeMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
         opts.stderrMaxBufferSize = stderrMaxBufferSize
-
-        return run(cmd, args, opts).pipe(
-          reduce((acc: Buffer[], curr: Buffer) => {
-            acc.push(curr)
-            return acc
-          }, []),
-          map(arr => Buffer.concat(arr)),
-        )
+        return assertWithStderrOutput(cmd, args, options)
       }),
     )
 
     ret$
       .pipe(
-        tap(buf => {
-          const ret = buf.toString()
-          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
-        }),
         finalize(() => done()),
       )
       .subscribe()
@@ -93,23 +71,12 @@ describe(filename, () => {
     const ret$ = ofrom(opensslCmds).pipe(
       concatMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
-
-        return run(cmd, args, opts).pipe(
-          reduce((acc: Buffer[], curr: Buffer) => {
-            acc.push(curr)
-            return acc
-          }, []),
-          map(arr => Buffer.concat(arr)),
-        )
+        return assertWithStderrOutput(cmd, args, options)
       }),
     )
 
     ret$
       .pipe(
-        tap(buf => {
-          const ret = buf.toString()
-          assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
-        }),
         finalize(() => done()),
       )
       .subscribe()
@@ -350,7 +317,7 @@ function assertNoStderrOutputBindStderrData(
   timeoutVal: number = 5000,
 ) {
 
-  const proc = spawn(cmd, args ? args : [], spawnOpts)
+  const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
     tap(buf => {
       assert(false, 'Should not emit data' + buf.toString())
@@ -371,7 +338,7 @@ function assertWithStderrOutputBindStderrData(
   takeUntilNotifier$: Observable<any>,
   skipUntilNotifier$: Observable<any>,
 ) {
-  const proc = spawn(cmd, args ? args : [], spawnOpts)
+  const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
     tap(buf => {
       assert(buf && buf.byteLength > 0, 'Should emit data, but byteLength zero')
@@ -397,4 +364,24 @@ function assertNoStderrOutput(
     }),
   )
   return ret$
+}
+
+
+function assertWithStderrOutput(
+  cmd: RxRunFnArgs[0],
+  args?: RxRunFnArgs[1] | null,
+  opts?: RxRunFnArgs[2] | null,
+) {
+
+  return run(cmd, args, opts).pipe(
+    reduce((acc: Buffer[], curr: Buffer) => {
+      acc.push(curr)
+      return acc
+    }, []),
+    map(arr => Buffer.concat(arr)),
+    tap(buf => {
+      const ret = buf.toString()
+      assert(ret.indexOf(needle) === 0, `Got result: "${ret}"`)
+    }),
+  )
 }

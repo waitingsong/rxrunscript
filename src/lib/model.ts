@@ -24,7 +24,7 @@ export interface RxRunFnArgs extends
   0: string
   /** args */
   1?: ReadonlyArray<string> | null
-  2?: Partial<RxSpawnOpts>
+  2?: Partial<RxSpawnOpts> | null
 }
 
 
