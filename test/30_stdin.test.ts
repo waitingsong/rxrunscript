@@ -8,9 +8,12 @@ import {
   concatMap,
   delay,
   finalize,
+  last,
   map,
   mergeMap,
   reduce,
+  shareReplay,
+  takeUntil,
   tap,
   timeout,
 } from 'rxjs/operators'
@@ -27,7 +30,6 @@ import {
 
 import {
   assertOpensslWithStderrOutput,
-  fakeCmds,
   opensslCmds,
 } from './helper'
 
@@ -35,51 +37,41 @@ import {
 const filename = basename(__filename)
 
 
-describe.only(filename, () => {
+describe(filename, () => {
 
-  describe('Should stdin works', () => {
+  describe('Should bindStdinData() works', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
     }
-    const caOpts = {
-      kind: 'ca',
-      centerName: 'default',
-      alg: 'rsa',
-      days: 10950,  // 30years
-      pass: 'mycapass',
-      keyBits: 2048,  // for speed
-      ecParamgenCurve: 'P-256',
-      hash: 'sha256',
-      CN: 'My Root CA',
-      OU: 'waitingsong.com',
-      O: '',
-      C: 'CN',
-      ST: '',
-      L: '',
-      emailAddress: '',
-    }
 
-
-
-    it('Should ', done => {
-      const pass = 'foobar'
-      const keyBits = 2048
+    it('Should got pubkey', done => {
+      const pass: string = Math.random().toString()
+      const keyBits: number = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
-        tap(key => {
-          console.log(key)
-        }),
         mergeMap(pkey => genPubKeyFromPrivateKey(pkey, pass, 'rsa', spawnOpts)),
-        tap(key => {
-          console.log(key)
-        }),
       )
 
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
+    it('Should got stderr with invalid passwd', done => {
+      const pass: string = Math.random().toString()
+      const keyBits: number = 2048
+      const ret$ = genRSAKey(pass, keyBits).pipe(
+        mergeMap(pkey => genPubKeyFromPrivateKey(pkey, 'fakepasswd', 'rsa', spawnOpts)),
+        tap(stderr => {
+          if (stderr && stderr.includes('stderr')) {
+            assert(stderr.includes('unable to load Private'), stderr)
+          }
+        }),
+      )
 
+      ret$.pipe(finalize(() => done())).subscribe()
+    })
   })
+
+
 })
 
 
@@ -103,8 +95,8 @@ function genRSAKey(pass: string, keyBits: number): Observable<string> {
 
 function genPubKeyFromPrivateKey(
   privateKey: string,
-  passwd: PrivateKeyOpts['pass'],
-  alg: PrivateKeyOpts['alg'],
+  passwd: string,
+  alg: 'rsa' | 'ec',
   spawnOpts: SpawnOptions,
 ): Observable<string> {
 
@@ -115,48 +107,42 @@ function genPubKeyFromPrivateKey(
   }
 
   const proc = spawn(cmd, args, spawnOpts)
-  const takeUntilNotifier$ = of('foo').pipe(delay(60000))
-  const input$ = of(privateKey, passwd).pipe(
-    delay(3000),
-    tap(val => {
-      console.log(val)
-    }),
+  const input$ = of(privateKey).pipe(
+    delay(500),
+    shareReplay(),
+  )
+  const takeUntilNotifier$ = input$.pipe(
+    last(),
+    delay(3500),
   )
 
-  const out$ = bindStdoutData(proc.stdout, NEVER).pipe(
+  const stdin$ = bindStdinData(proc.stdin, input$)
+  const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
     map(buf => buf.toString()),
-    tap(ret => {
-      console.log('ret---------------:', ret)
-      if (! ret || ! ret.includes('PUBLIC KEY')) {
-        throw new Error('no PUBKEY')
+    tap(pem => {
+      if (! pem || ! pem.includes('PUBLIC KEY')) {
+        throw new Error('not PUBKEY: ' + pem)
       }
     }),
   )
-
-  const stderr$ = bindStderrData(proc.stderr, NEVER, of(null), 2000).pipe(
+  const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
     map(buf => buf.toString()),
-    tap(err => {
-      console.log(err)
+    map(str => {
+      return `stderr: ${str}`
     }),
   )
 
-  const never$ = bindStdinData(proc.stdin, takeUntilNotifier$, input$)
-
-  const ret$ = merge(out$, never$, stderr$)
+  const ret$ = merge(
+    stdin$,
+    stdout$,
+    stderr$,
+  )
 
   return ret$
 }
 
-export interface PrivateKeyOpts {
-  // serial: string
-  centerName: 'default' | string
-  alg: 'rsa' | 'ec'
-  pass: string
-  keyBits: number // for alg==rsa
-  ecParamgenCurve?: 'P-256' | 'P-384' // for alg==ec
-}
 
-export function runOpenssl(args: string[], options?: Partial<RxSpawnOpts>): Observable<string> {
+function runOpenssl(args: string[], options?: Partial<RxSpawnOpts>): Observable<string> {
   const script = 'openssl'
   const ret$ = run(script, args, options)
 

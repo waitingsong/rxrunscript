@@ -1,5 +1,5 @@
 import { ChildProcess } from 'child_process'
-import { merge, of, race, EMPTY, Observable } from 'rxjs'
+import { iif, merge, of, race, EMPTY, NEVER, Observable } from 'rxjs'
 import {
   finalize,
   mergeMap,
@@ -7,11 +7,12 @@ import {
   tap,
  } from 'rxjs/operators'
 
-import { MsgPrefixOpts } from './model'
+import { MsgPrefixOpts, RxSpawnOpts } from './model'
 import { bindProcClose } from './proc-close'
 import { bindProcError } from './proc-error'
 import { bindProcExit } from './proc-exit'
 import { bindStderrData } from './stderr'
+import { bindStdinData } from './stdin'
 import { bindStdoutData } from './stdout'
 
 
@@ -20,6 +21,7 @@ export function bindEvent(
   stderrMaxBufferSize: number,
   msgPrefixOpts: MsgPrefixOpts,
   script: string, // for throw error
+  stdinStream: RxSpawnOpts['stdinStream'],
 ): Observable<Buffer> {
 
   const { stderrPrefix } = msgPrefixOpts
@@ -54,9 +56,16 @@ export function bindEvent(
     }),
   )
 
+  const stdin$: Observable<never> = iif(
+    () => stdinStream && stdinStream instanceof Observable ? true : false,
+    bindStdinData(proc.stdin, closeOrExit$),
+    EMPTY,
+  )
+
   const ret$ = merge(
     stdout$,
     stderr$,
+    stdin$,
     error$,
   ).pipe(
     finalize(() => {
