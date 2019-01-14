@@ -16,7 +16,7 @@ export interface RxSpawnOpts extends SpawnOptionsPatical {
   /**
    * emit data with subprocess.stdin.write()
    */
-  stdinStream?: Observable<any>
+  inputStream?: Observable<any>
 }
 
 export interface MsgPrefixOpts {

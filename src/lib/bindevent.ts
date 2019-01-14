@@ -21,7 +21,7 @@ export function bindEvent(
   stderrMaxBufferSize: number,
   msgPrefixOpts: MsgPrefixOpts,
   script: string, // for throw error
-  stdinStream: RxSpawnOpts['stdinStream'],
+  inputStream: RxSpawnOpts['inputStream'],
 ): Observable<Buffer> {
 
   const { stderrPrefix } = msgPrefixOpts
@@ -56,11 +56,9 @@ export function bindEvent(
     }),
   )
 
-  const stdin$: Observable<never> = iif(
-    () => stdinStream && stdinStream instanceof Observable ? true : false,
-    bindStdinData(proc.stdin, closeOrExit$),
-    EMPTY,
-  )
+  const stdin$: Observable<never> = inputStream && typeof inputStream.subscribe === 'function'
+    ? bindStdinData(proc.stdin, inputStream)
+    : EMPTY
 
   const ret$ = merge(
     stdout$,

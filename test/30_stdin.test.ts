@@ -47,6 +47,7 @@ describe(filename, () => {
 
     it('Should got pubkey', done => {
       const pass: string = Math.random().toString()
+      // const pass: string = 'foobar'
       const keyBits: number = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
         mergeMap(pkey => genPubKeyFromPrivateKey(pkey, pass, 'rsa', spawnOpts)),
@@ -73,6 +74,29 @@ describe(filename, () => {
 
 
 })
+
+
+describe(filename, () => {
+
+  describe('Should stdin works', () => {
+    const spawnOpts: SpawnOptions = {
+      windowsVerbatimArguments: true,
+      shell: true,
+    }
+
+    it('Should got pubkey', done => {
+      const pass: string = Math.random().toString()
+      const keyBits: number = 2048
+      const ret$ = genRSAKey(pass, keyBits).pipe(
+        mergeMap(pkey => runGenPubKeyFromPrivateKey(pkey, pass, 'rsa', spawnOpts)),
+      )
+
+      ret$.pipe(finalize(() => done())).subscribe()
+    })
+  })
+
+})
+
 
 
 function genRSAKey(pass: string, keyBits: number): Observable<string> {
@@ -105,10 +129,10 @@ function genPubKeyFromPrivateKey(
   if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
     args.push('-passin', `pass:${passwd}`)
   }
+  args.push('-in', '-')
 
   const proc = spawn(cmd, args, spawnOpts)
   const input$ = of(privateKey).pipe(
-    delay(500),
     shareReplay(),
   )
   const takeUntilNotifier$ = input$.pipe(
@@ -136,6 +160,38 @@ function genPubKeyFromPrivateKey(
     stdin$,
     stdout$,
     stderr$,
+  )
+
+  return ret$
+}
+
+
+function runGenPubKeyFromPrivateKey(
+  privateKey: string,
+  passwd: string,
+  alg: 'rsa' | 'ec',
+  spawnOpts: SpawnOptions,
+): Observable<string> {
+
+  const cmd = 'openssl'
+  const args = [alg, '-pubout']
+  if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
+    args.push('-passin', `pass:${passwd}`)
+  }
+  args.push('-in', '-')
+
+  const input$ = of(privateKey).pipe(
+    delay(2000),
+    shareReplay(),
+  )
+
+  const ret$ = run(cmd, args, { ...spawnOpts, inputStream: input$ }).pipe(
+    map(buf => buf.toString()),
+    tap(pem => {
+      if (! pem || ! pem.includes('PUBLIC KEY')) {
+        throw new Error('not PUBKEY: ' + pem)
+      }
+    }),
   )
 
   return ret$

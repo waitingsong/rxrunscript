@@ -28,7 +28,7 @@ export function run(
   })
   const { errScript } = opts
   const { errPrefix, stderrPrefix } = opts.spawnOpts.msgPrefixOpts
-  const { stdinStream } = opts.spawnOpts
+  const { inputStream } = opts.spawnOpts
 
   const proc$ = runSpawn(opts.command, opts.args, opts.spawnOpts)
   const ret$ = proc$.pipe(
@@ -38,7 +38,7 @@ export function run(
         opts.spawnOpts.stderrMaxBufferSize,
         opts.spawnOpts.msgPrefixOpts,
         opts.errScript,
-        stdinStream,
+        inputStream,
       )
     }),
     catchError((err: Error) => {

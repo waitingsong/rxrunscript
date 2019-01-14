@@ -13,6 +13,7 @@ export function bindStdinData(
 
   const ret$ = inputData$.pipe(
     tap(data => {
+      // console.log('bindStdinData:', data)
       // debug in vsc below will cause EPIPE error
       stdin.write(data, (err: Error | void) => {
         if (err) {
