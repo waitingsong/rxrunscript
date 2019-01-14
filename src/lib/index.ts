@@ -1,10 +1,10 @@
-import { spawn, ChildProcess } from 'child_process'
+import { spawn, ChildProcess, SpawnOptions } from 'child_process'
 import { of, throwError, Observable } from 'rxjs'
 import { catchError, mergeMap } from 'rxjs/operators'
 
 import { bindEvent } from './bindevent'
 import { initialRxRunOpts } from './config'
-import { RxRunFnArgs, RxSpawnOpts } from './model'
+import { RxRunFnArgs } from './model'
 import { processOpts } from './prepare'
 
 
@@ -28,6 +28,7 @@ export function run(
   })
   const { errScript } = opts
   const { errPrefix, stderrPrefix } = opts.spawnOpts.msgPrefixOpts
+  const { inputStream } = opts.spawnOpts
 
   const proc$ = runSpawn(opts.command, opts.args, opts.spawnOpts)
   const ret$ = proc$.pipe(
@@ -37,6 +38,7 @@ export function run(
         opts.spawnOpts.stderrMaxBufferSize,
         opts.spawnOpts.msgPrefixOpts,
         opts.errScript,
+        inputStream,
       )
     }),
     catchError((err: Error) => {
@@ -55,7 +57,7 @@ export function run(
 function runSpawn(
   command: string,
   runArgs: string[],
-  spawnOpts: RxSpawnOpts,
+  spawnOpts: SpawnOptions,
 ): Observable<ChildProcess> {
   try {
     const proc = spawn(command, runArgs, spawnOpts)

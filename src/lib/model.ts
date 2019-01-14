@@ -1,7 +1,10 @@
 import { SpawnOptions } from 'child_process'
+import { Observable } from 'rxjs'
 
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
-export interface RxSpawnOpts extends SpawnOptions {
+export type SpawnOptionsPatical = Omit<SpawnOptions, 'stdio'>
+export interface RxSpawnOpts extends SpawnOptionsPatical {
   msgPrefixOpts: MsgPrefixOpts
   /**
    * maxBufferSize for stderr. default: 200
@@ -10,8 +13,11 @@ export interface RxSpawnOpts extends SpawnOptions {
    * - positive: emit error() if subprocess exit with non zero | null code
    */
   stderrMaxBufferSize: number
+  /**
+   * emit data with subprocess.stdin.write()
+   */
+  inputStream?: Observable<any>
 }
-
 
 export interface MsgPrefixOpts {
   errPrefix: string

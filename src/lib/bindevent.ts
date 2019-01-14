@@ -7,11 +7,12 @@ import {
   tap,
  } from 'rxjs/operators'
 
-import { MsgPrefixOpts } from './model'
+import { MsgPrefixOpts, RxSpawnOpts } from './model'
 import { bindProcClose } from './proc-close'
 import { bindProcError } from './proc-error'
 import { bindProcExit } from './proc-exit'
 import { bindStderrData } from './stderr'
+import { bindStdinData } from './stdin'
 import { bindStdoutData } from './stdout'
 
 
@@ -20,6 +21,7 @@ export function bindEvent(
   stderrMaxBufferSize: number,
   msgPrefixOpts: MsgPrefixOpts,
   script: string, // for throw error
+  inputStream: RxSpawnOpts['inputStream'],
 ): Observable<Buffer> {
 
   const { stderrPrefix } = msgPrefixOpts
@@ -54,9 +56,14 @@ export function bindEvent(
     }),
   )
 
+  const stdin$: Observable<never> = inputStream && typeof inputStream.subscribe === 'function'
+    ? bindStdinData(proc.stdin, inputStream)
+    : EMPTY
+
   const ret$ = merge(
     stdout$,
     stderr$,
+    stdin$,
     error$,
   ).pipe(
     finalize(() => {

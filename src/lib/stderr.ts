@@ -1,3 +1,4 @@
+import { ChildProcess } from 'child_process'
 import { fromEvent, NEVER, Observable } from 'rxjs'
 import {
   buffer,
@@ -11,7 +12,7 @@ import {
 
 
 export function bindStderrData(
-  stderr: NodeJS.ReadableStream,
+  stderr: ChildProcess['stderr'],
   takeUntilNotifier$: Observable<any>,
   skipUntilNofifier$: Observable<any>,
   bufMaxSize: number,
