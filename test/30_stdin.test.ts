@@ -47,7 +47,6 @@ describe(filename, () => {
 
     it('Should got pubkey', done => {
       const pass: string = Math.random().toString()
-      // const pass: string = 'foobar'
       const keyBits: number = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
         mergeMap(pkey => genPubKeyFromPrivateKey(pkey, pass, 'rsa', spawnOpts)),
@@ -129,7 +128,7 @@ function genPubKeyFromPrivateKey(
   if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
     args.push('-passin', `pass:${passwd}`)
   }
-  // args.push('-in', '-')
+  // args.push('-in', '-') // for CLI test
 
   const proc = spawn(cmd, args, spawnOpts)
   const input$ = of(privateKey).pipe(
@@ -178,7 +177,7 @@ function runGenPubKeyFromPrivateKey(
   if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
     args.push('-passin', `pass:${passwd}`)
   }
-  // args.push('-in', '-')
+  // args.push('-in', '-') // for CLI test
 
   const input$ = of(privateKey).pipe(
     delay(2000),
