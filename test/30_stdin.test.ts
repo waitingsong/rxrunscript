@@ -11,6 +11,7 @@ import {
   finalize,
   last,
   map,
+  mapTo,
   mergeMap,
   reduce,
   shareReplay,
@@ -76,14 +77,36 @@ describe(filename, () => {
       const keyBits: number = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
         mergeMap(pkey => genPubKeyFromPrivateKeyForError(pkey, pass, 'rsa', spawnOpts)),
+        catchError((err: Error) => {
+          assert((err instanceof Error) &&
+            err.message.includes('write after end'),
+            `Should throw "write after end" error, but with "${err.message}"`,
+          )
+          return EMPTY
+        }),
+      )
+
+      ret$.pipe(finalize(() => done())).subscribe()
+    })
+
+    it('Should throw "This socket is closed" error', done => {
+      const pass: string = Math.random().toString()
+      const keyBits: number = 2048
+      const ret$ = genRSAKey(pass, keyBits).pipe(
+        mergeMap(pkey => genPubKeyFromPrivateKeyForCloseError(pkey, pass, 'rsa', spawnOpts)),
+        catchError((err: Error) => {
+          assert((err instanceof Error) &&
+            err.message.includes('This socket is closed'),
+            `Should throw "This socket is closed" error, but throw ${err.message}`,
+            )
+          return EMPTY
+        }),
       )
 
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
   })
-
-
 })
 
 
@@ -252,24 +275,7 @@ function genPubKeyFromPrivateKeyForError(
     delay(3500),
   )
 
-  const stdin$ = bindStdinData(proc.stdin, input$).pipe(
-    catchError((err: Error) => {
-      assert((err instanceof Error) &&
-        err.message.includes('write after end'),
-        `Should throw "write after end" error, but with "${err.message}"`,
-        )
-      return EMPTY
-    }),
-  )
-  const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
-    map(buf => buf.toString()),
-    tap(pem => {
-      if (! pem || ! pem.includes('PUBLIC KEY')) {
-        throw new Error('no PUBKEY: ' + pem)
-      }
-    }),
-    timeout(10000),
-  )
+  const stdin$ = bindStdinData(proc.stdin, input$).pipe()
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
     map(buf => buf.toString()),
     map(str => {
@@ -279,7 +285,57 @@ function genPubKeyFromPrivateKeyForError(
 
   const ret$ = merge(
     stdin$,
-    stdout$,
+    stderr$,
+  )
+
+  return ret$
+}
+
+
+function genPubKeyFromPrivateKeyForCloseError(
+  privateKey: string,
+  passwd: string,
+  alg: 'rsa' | 'ec',
+  spawnOpts: SpawnOptions,
+): Observable<string> {
+
+  const cmd = 'openssl'
+  const args = [alg, '-pubout']
+  if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
+    args.push('-passin', `pass:${passwd}`)
+  }
+  // args.push('-in', '-') // for CLI test
+
+  const proc = spawn(cmd, args, spawnOpts)
+
+  const write$ = of(proc.stdin).pipe(
+    delay(500),
+    tap(stdin => {
+      stdin.write(privateKey)
+    }),
+    mapTo('write ok'),
+  )
+
+  const input$ = of(privateKey).pipe(
+    delay(2000),
+    shareReplay(),
+  )
+  const takeUntilNotifier$ = input$.pipe(
+    last(),
+    delay(4000),
+  )
+
+  const stdin$ = bindStdinData(proc.stdin, input$)
+  const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
+    map(buf => buf.toString()),
+    map(str => {
+      return `stderr: ${str}`
+    }),
+  )
+
+  const ret$ = merge(
+    write$,
+    stdin$,
     stderr$,
   )
 
