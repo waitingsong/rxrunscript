@@ -96,7 +96,8 @@ describe(filename, () => {
         mergeMap(pkey => genPubKeyFromPrivateKeyForCloseError(pkey, pass, 'rsa', spawnOpts)),
         catchError((err: Error) => {
           assert((err instanceof Error) &&
-            err.message.includes('This socket is closed'),
+            (err.message.includes('This socket is closed') ||
+              err.message.includes('Cannot call write after a stream was destroyed')),
             `Should throw "This socket is closed" error, but throw ${err.message}`,
             )
           return EMPTY
