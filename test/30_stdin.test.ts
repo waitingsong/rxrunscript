@@ -37,7 +37,7 @@ import {
 const filename = basename(__filename)
 
 
-describe(filename, () => {
+describe.only(filename, () => {
 
   describe('Should bindStdinData() works', () => {
     const spawnOpts: SpawnOptions = {
@@ -76,7 +76,7 @@ describe(filename, () => {
 })
 
 
-describe(filename, () => {
+describe.only(filename, () => {
 
   describe('Should stdin works', () => {
     const spawnOpts: SpawnOptions = {
@@ -129,7 +129,7 @@ function genPubKeyFromPrivateKey(
   if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
     args.push('-passin', `pass:${passwd}`)
   }
-  args.push('-in', '-')
+  // args.push('-in', '-')
 
   const proc = spawn(cmd, args, spawnOpts)
   const input$ = of(privateKey).pipe(
@@ -178,7 +178,7 @@ function runGenPubKeyFromPrivateKey(
   if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
     args.push('-passin', `pass:${passwd}`)
   }
-  args.push('-in', '-')
+  // args.push('-in', '-')
 
   const input$ = of(privateKey).pipe(
     delay(2000),
