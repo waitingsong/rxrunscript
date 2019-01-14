@@ -4,7 +4,7 @@ import { catchError, mergeMap } from 'rxjs/operators'
 
 import { bindEvent } from './bindevent'
 import { initialRxRunOpts } from './config'
-import { RxRunFnArgs, RxSpawnOpts, SpawnOptionsPatical } from './model'
+import { RxRunFnArgs } from './model'
 import { processOpts } from './prepare'
 
 
