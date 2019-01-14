@@ -38,7 +38,7 @@ import {
 const filename = basename(__filename)
 
 
-describe.only(filename, () => {
+describe(filename, () => {
 
   describe('Should bindStdinData() works', () => {
     const spawnOpts: SpawnOptions = {
@@ -87,7 +87,7 @@ describe.only(filename, () => {
 })
 
 
-describe.only(filename, () => {
+describe(filename, () => {
 
   describe('Should stdin works', () => {
     const spawnOpts: SpawnOptions = {
