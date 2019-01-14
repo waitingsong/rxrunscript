@@ -2,10 +2,11 @@
 
 import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
-import { defer, from as ofrom, merge, of, NEVER, Observable } from 'rxjs'
+import { defer, from as ofrom, iif, merge, of, EMPTY, NEVER, Observable } from 'rxjs'
 import {
   catchError,
   concatMap,
+  defaultIfEmpty,
   delay,
   finalize,
   last,
@@ -37,7 +38,7 @@ import {
 const filename = basename(__filename)
 
 
-describe(filename, () => {
+describe.only(filename, () => {
 
   describe('Should bindStdinData() works', () => {
     const spawnOpts: SpawnOptions = {
@@ -49,7 +50,7 @@ describe(filename, () => {
       const pass: string = Math.random().toString()
       const keyBits: number = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
-        mergeMap(pkey => genPubKeyFromPrivateKey(pkey, pass, 'rsa', spawnOpts)),
+        mergeMap(pkey => genPubKeyFromPrivateKeyWithDefaultValue(pkey, pass, 'rsa', spawnOpts)),
       )
 
       ret$.pipe(finalize(() => done())).subscribe()
@@ -69,13 +70,24 @@ describe(filename, () => {
 
       ret$.pipe(finalize(() => done())).subscribe()
     })
+
+    it('Should throw "write after end" error', done => {
+      const pass: string = Math.random().toString()
+      const keyBits: number = 2048
+      const ret$ = genRSAKey(pass, keyBits).pipe(
+        mergeMap(pkey => genPubKeyFromPrivateKeyForError(pkey, pass, 'rsa', spawnOpts)),
+      )
+
+      ret$.pipe(finalize(() => done())).subscribe()
+    })
+
   })
 
 
 })
 
 
-describe(filename, () => {
+describe.only(filename, () => {
 
   describe('Should stdin works', () => {
     const spawnOpts: SpawnOptions = {
@@ -116,6 +128,56 @@ function genRSAKey(pass: string, keyBits: number): Observable<string> {
 }
 
 
+function genPubKeyFromPrivateKeyWithDefaultValue(
+  privateKey: string,
+  passwd: string,
+  alg: 'rsa' | 'ec',
+  spawnOpts: SpawnOptions,
+): Observable<string> {
+
+  const cmd = 'openssl'
+  const args = [alg, '-pubout']
+  if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
+    args.push('-passin', `pass:${passwd}`)
+  }
+  // args.push('-in', '-') // for CLI test
+
+  const proc = spawn(cmd, args, spawnOpts)
+  const input$ = of(privateKey).pipe(
+    shareReplay(),
+  )
+  const takeUntilNotifier$ = input$.pipe(
+    last(),
+    delay(3500),
+  )
+
+  const stdin$ = bindStdinData(proc.stdin, input$)
+  const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
+    map(buf => buf.toString()),
+    defaultIfEmpty('no stdout output'),
+    tap(pem => {
+      if (! pem || ! pem.includes('PUBLIC KEY')) {
+        throw new Error('not PUBKEY: ' + pem)
+      }
+    }),
+  )
+  const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
+    map(buf => buf.toString()),
+    map(str => {
+      return `stderr: ${str}`
+    }),
+  )
+
+  const ret$ = merge(
+    stdin$,
+    stdout$,
+    stderr$,
+  )
+
+  return ret$
+}
+
+
 function genPubKeyFromPrivateKey(
   privateKey: string,
   passwd: string,
@@ -142,11 +204,71 @@ function genPubKeyFromPrivateKey(
   const stdin$ = bindStdinData(proc.stdin, input$)
   const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
     map(buf => buf.toString()),
+    // defaultIfEmpty('no stdout output'),
     tap(pem => {
       if (! pem || ! pem.includes('PUBLIC KEY')) {
         throw new Error('not PUBKEY: ' + pem)
       }
     }),
+  )
+  const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
+    map(buf => buf.toString()),
+    map(str => {
+      return `stderr: ${str}`
+    }),
+  )
+
+  const ret$ = merge(
+    stdin$,
+    stdout$,
+    stderr$,
+  )
+
+  return ret$
+}
+
+
+function genPubKeyFromPrivateKeyForError(
+  privateKey: string,
+  passwd: string,
+  alg: 'rsa' | 'ec',
+  spawnOpts: SpawnOptions,
+): Observable<string> {
+
+  const cmd = 'openssl'
+  const args = [alg, '-pubout']
+  if (passwd && privateKey.indexOf('ENCRYPTED') > 0) {
+    args.push('-passin', `pass:${passwd}`)
+  }
+  // args.push('-in', '-') // for CLI test
+
+  const proc = spawn(cmd, args, spawnOpts)
+  const input$ = of(privateKey).pipe(
+    tap(() => proc.stdin.end()), // close stdint
+    shareReplay(),
+  )
+  const takeUntilNotifier$ = input$.pipe(
+    last(),
+    delay(3500),
+  )
+
+  const stdin$ = bindStdinData(proc.stdin, input$).pipe(
+    catchError((err: Error) => {
+      assert((err instanceof Error) &&
+        err.message.includes('write after end'),
+        `Should throw "write after end" error, but with "${err.message}"`,
+        )
+      return EMPTY
+    }),
+  )
+  const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
+    map(buf => buf.toString()),
+    tap(pem => {
+      if (! pem || ! pem.includes('PUBLIC KEY')) {
+        throw new Error('no PUBKEY: ' + pem)
+      }
+    }),
+    timeout(10000),
   )
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
     map(buf => buf.toString()),
@@ -186,6 +308,7 @@ function runGenPubKeyFromPrivateKey(
 
   const ret$ = run(cmd, args, { ...spawnOpts, inputStream: input$ }).pipe(
     map(buf => buf.toString()),
+    defaultIfEmpty('no output'),
     tap(pem => {
       if (! pem || ! pem.includes('PUBLIC KEY')) {
         throw new Error('not PUBKEY: ' + pem)
