@@ -1,5 +1,9 @@
 /// <reference types="mocha" />
 
+import {
+  basename,
+  join,
+} from '@waiting/shared-core'
 import { sep } from 'path'
 import * as assert from 'power-assert'
 import { concat, from as ofrom, of, EMPTY } from 'rxjs'
@@ -15,10 +19,6 @@ import {
 } from 'rxjs/operators'
 
 import { run, RxRunFnArgs } from '../src/index'
-import {
-  basename,
-  join,
-} from '../src/shared/index'
 
 import { opensslCmds, testIntervalSource } from './helper'
 

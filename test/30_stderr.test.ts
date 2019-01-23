@@ -1,5 +1,9 @@
 /// <reference types="mocha" />
 
+import {
+  basename,
+  join,
+} from '@waiting/shared-core'
 import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
@@ -18,10 +22,6 @@ import {
 import { RxRunFnArgs, RxSpawnOpts } from '../src/index'
 import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
-import {
-  basename,
-  join,
-} from '../src/shared/index'
 
 import {
   assertOpensslWithStderrOutput,

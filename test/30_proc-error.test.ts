@@ -1,5 +1,9 @@
 /// <reference types="mocha" />
 
+import {
+  basename,
+  join,
+} from '@waiting/shared-core'
 import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
@@ -12,10 +16,6 @@ import {
 
 import { run, RxSpawnOpts } from '../src/index'
 import { initialMsgPrefixOpts } from '../src/lib/config'
-import {
-  basename,
-  join,
-} from '../src/shared/index'
 
 import { assetRunError, opensslCmds } from './helper'
 

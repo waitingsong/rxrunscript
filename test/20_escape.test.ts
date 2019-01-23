@@ -1,12 +1,12 @@
 /// <reference types="mocha" />
 
-import * as assert from 'power-assert'
-
-import { escapeShell } from '../src/index'
 import {
   basename,
   join,
-} from '../src/shared/index'
+} from '@waiting/shared-core'
+import * as assert from 'power-assert'
+
+import { escapeShell } from '../src/index'
 
 
 const filename = basename(__filename)

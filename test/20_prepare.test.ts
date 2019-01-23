@@ -1,5 +1,9 @@
 /// <reference types="mocha" />
 
+import {
+  basename,
+  join,
+} from '@waiting/shared-core'
 import * as assert from 'power-assert'
 import { from as ofrom, of, EMPTY } from 'rxjs'
 import { finalize, map, mergeMap, tap } from 'rxjs/operators'
@@ -7,10 +11,6 @@ import { finalize, map, mergeMap, tap } from 'rxjs/operators'
 import { ProcessOpts } from '../src/index'
 import { initialMsgPrefixOpts, initialRxRunOpts } from '../src/lib/config'
 import { processOpts } from '../src/lib/prepare'
-import {
-  basename,
-  join,
-} from '../src/shared/index'
 
 import { assetRunError } from './helper'
 

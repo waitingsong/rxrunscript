@@ -1,11 +1,12 @@
 /// <reference types="mocha" />
 
 
-import { initialMsgPrefixOpts } from '../src/lib/config'
 import {
   basename,
   join,
-} from '../src/shared/index'
+} from '@waiting/shared-core'
+
+import { initialMsgPrefixOpts } from '../src/lib/config'
 
 import { fakeCmds, testStderrPrefixWithExitError } from './helper'
 
