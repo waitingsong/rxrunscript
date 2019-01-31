@@ -1,7 +1,7 @@
 {
   "name": "rxrunscript",
   "author": "waiting",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Run shell script in child process, Output Observable<Buffer>",
   "keywords": [
     "npm run",
