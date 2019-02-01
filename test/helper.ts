@@ -194,7 +194,7 @@ export function assertOpensslWithStderrOutput(
     tap(buf => {
       const ret = buf.toString().trim()
       assert(
-        ret.indexOf(needle) === 0,
+        !ret || ret.indexOf(needle) === 0,
         `Command: ${cmd}\nGot result: "${ret}"`)
     }),
   )
