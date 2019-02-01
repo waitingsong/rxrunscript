@@ -5,7 +5,7 @@ Run shell script or command in Node.js child process, Output `Observable<Buffer>
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/waitingsong/rxrunscript.svg?branch=master)](https://travis-ci.org/waitingsong/rxrunscript)
 [![Build status](https://ci.appveyor.com/api/projects/status/v5jt9imw2519nsax/branch/master?svg=true)](https://ci.appveyor.com/project/waitingsong/rxrunscript/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/waitingsong/node-myca/badge.svg?branch=master)](https://coveralls.io/github/waitingsong/rxrunscript?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/waitingsong/rxrunscript/badge.svg?branch=master)](https://coveralls.io/github/waitingsong/rxrunscript?branch=master)
 
 
 
