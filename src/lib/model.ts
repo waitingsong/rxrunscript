@@ -17,6 +17,12 @@ export interface RxSpawnOpts extends SpawnOptionsPatical {
    * emit data with subprocess.stdin.write()
    */
   inputStream?: Observable<any>
+  /**
+   * Maximum length of command.
+   * 0: unlimited.
+   * Default: 2048 (byte)
+   */
+  maxCmdLength?: number
 }
 
 export interface MsgPrefixOpts {

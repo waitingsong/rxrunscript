@@ -15,6 +15,7 @@ export const initialMsgPrefixOpts: MsgPrefixOpts = {
 }
 
 export const initialRxRunOpts: RxSpawnOpts = {
+  maxCmdLength: 2048,
   msgPrefixOpts: initialMsgPrefixOpts,
   stderrMaxBufferSize: 200,
 }

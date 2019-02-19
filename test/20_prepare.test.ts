@@ -59,6 +59,9 @@ describe(filename, () => {
           const opts: ProcessOpts = {
             command: cmd,
             initialRxRunOpts,
+            spawnOpts: {
+              maxCmdLength: 1000,
+            },
           }
           return of(opts)
         }),

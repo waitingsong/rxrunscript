@@ -68,9 +68,11 @@ function processCommand(
   }
 
   /* istanbul ignore else */
-  if (cmd.length > 1000) {
+  if (typeof spawnOpts.maxCmdLength === 'number' &&
+    spawnOpts.maxCmdLength > 0 &&
+    cmd.length > spawnOpts.maxCmdLength) {
     throw new TypeError(
-      `${errPrefix}\nCommand length exceed 1000\n` + cmd.slice(1000) + ' ...')
+      `${errPrefix}\nCommand length exceed ${spawnOpts.maxCmdLength}\n` + cmd.slice(1024) + ' ...')
   }
 
   return cmd
