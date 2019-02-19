@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/waitingsong/rxrunscript/compare/v5.1.3...v5.2.0) (2019-02-19)
+
+
+### Features
+
+* add RxSpawnOpts['maxCmdLength'], Default value 2048 ([c47dbde](https://github.com/waitingsong/rxrunscript/commit/c47dbde))
+
+
+
 <a name="5.1.3"></a>
 ## [5.1.3](https://github.com/waitingsong/rxrunscript/compare/v5.1.2...v5.1.3) (2019-02-19)
 
