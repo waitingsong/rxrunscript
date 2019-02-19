@@ -1,6 +1,7 @@
 import { ChildProcess } from 'child_process'
 import { merge, of, race, EMPTY, Observable } from 'rxjs'
 import {
+  defaultIfEmpty,
   finalize,
   mergeMap,
   shareReplay,
@@ -71,6 +72,8 @@ export function bindEvent(
       // link: https://nodejs.org/api/child_process.html#child_process_subprocess_kill_signal
       proc.killed || proc.kill()
     }),
+    defaultIfEmpty(Buffer.from('')),
+    // tap(data => console.log(data)),
   )
 
   return ret$

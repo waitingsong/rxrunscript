@@ -312,3 +312,35 @@ describe(filename, () => {
       .subscribe()
   })
 })
+
+
+describe(filename, () => {
+  it('Should works without any output', done => {
+    const cmds: RxRunFnArgs[] = [
+      ['cd /'],
+      ['cd ..'],
+      ['cd', ['/'] ],
+      ['cd', ['..'] ],
+    ]
+
+    ofrom(cmds).pipe(
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts).pipe(
+          defaultIfEmpty(Buffer.from('Should empty value')),
+          timeout(3000),
+        )
+      }),
+    )
+      .subscribe(
+        (buf: Buffer) => {
+          assert(!buf.byteLength, 'Should result empty, but got: ' + buf.toString())
+        },
+        err => {
+          assert(false, err)
+          done()
+        },
+        done,
+      )
+
+  })
+})
