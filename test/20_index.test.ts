@@ -327,7 +327,7 @@ describe(filename, () => {
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
           defaultIfEmpty(Buffer.from('Should empty value')),
-          timeout(3000),
+          timeout(5000),
         )
       }),
     )
