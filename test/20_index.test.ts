@@ -43,6 +43,7 @@ describe(filename, () => {
       .subscribe(
         buf => {
           try {
+            console.info(buf)
             const ret = buf.toString()
             assert(ret.includes('OpenSSL'), `result: "${ret}"`)
           }
