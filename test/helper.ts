@@ -114,7 +114,9 @@ export function testStderrPrefixWithExitError(
     concatMap(([cmd, args, opts]) => {
       return run(cmd, args, opts).pipe(
         tap(buf => {
-          assert(false, 'Should not got stdout data:' + buf.toString())
+          if (buf && buf.byteLength) {
+            assert(false, 'Should not got stdout data:' + buf.toString())
+          }
         }),
         catchError((err: Error) => {
           assertStderr(err, stderrPrefix)
