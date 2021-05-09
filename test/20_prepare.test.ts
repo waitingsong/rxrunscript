@@ -22,7 +22,7 @@ const filename = basename(__filename)
 describe(filename, () => {
   describe('Should processOpts() works', () => {
 
-    it('blank command', done => {
+    it('blank command', (done) => {
       const cmds: string[] = [
         '',
         ' ',
@@ -30,14 +30,14 @@ describe(filename, () => {
       ]
 
       ofrom(cmds).pipe(
-        mergeMap(cmd => {
+        mergeMap((cmd) => {
           const opts: ProcessOpts = {
             command: cmd,
             initialRxRunOpts,
           }
           return of(opts)
         }),
-        map(opts => {
+        map((opts) => {
           try {
             const rxrunOpts = processOpts(opts)
             assert(false, 'Should throw error, but not')
@@ -51,11 +51,11 @@ describe(filename, () => {
       ).subscribe()
     })
 
-    it('command length exceed 1000', done => {
+    it('command length exceed 1000', (done) => {
       const random = Math.random() + ''
 
       ofrom([random.repeat(100)]).pipe(
-        mergeMap(cmd => {
+        mergeMap((cmd) => {
           const opts: ProcessOpts = {
             command: cmd,
             initialRxRunOpts,
@@ -65,7 +65,7 @@ describe(filename, () => {
           }
           return of(opts)
         }),
-        map(opts => {
+        map((opts) => {
           try {
             const rxrunOpts = processOpts(opts)
             assert(false, 'Should throw error, but not')

@@ -1,10 +1,11 @@
 /// <reference types="mocha" />
 
+import { spawn, SpawnOptions } from 'child_process'
+
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
 import {
@@ -35,7 +36,7 @@ const filename = basename(__filename)
 
 describe(filename, () => {
 
-  it('Should ignore stderr with maxStderrBuffer: 0', done => {
+  it('Should ignore stderr with maxStderrBuffer: 0', (done) => {
     const stderrMaxBufferSize = 0
     const ret$ = ofrom(opensslCmds).pipe(
       mergeMap(([cmd, args, options]) => {
@@ -48,7 +49,7 @@ describe(filename, () => {
     ret$.pipe(finalize(() => done())).subscribe()
   })
 
-  it('Should no stderr output with maxStderrBuffer default value(200) and exit code 0', done => {
+  it('Should no stderr output with maxStderrBuffer default value(200) and exit code 0', (done) => {
     const ret$ = ofrom(opensslCmds).pipe(
       concatMap(([cmd, args, options]) => {
         const opts: Partial<RxSpawnOpts> = { ...options }
@@ -59,7 +60,7 @@ describe(filename, () => {
     ret$.pipe(finalize(() => done())).subscribe()
   })
 
-  it('Should no stderr output with negative maxStderrBuffer (will use default value)', done => {
+  it('Should no stderr output with negative maxStderrBuffer (will use default value)', (done) => {
     const stderrMaxBufferSize = -1
     const ret$ = ofrom(opensslCmds).pipe(
       mergeMap(([cmd, args, options]) => {
@@ -84,7 +85,7 @@ describe(filename, () => {
       shell: true,
     }
 
-    it('Should ignore stderr with bufMaxSize: 0', done => {
+    it('Should ignore stderr with bufMaxSize: 0', (done) => {
       const stderrMaxBufferSize = 0
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(opensslCmds).pipe(
@@ -102,7 +103,7 @@ describe(filename, () => {
         .subscribe()
     })
 
-    it('Should no stderr output with default bufMaxSize', done => {
+    it('Should no stderr output with default bufMaxSize', (done) => {
       const stderrMaxBufferSize = initialRxRunOpts.stderrMaxBufferSize
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(opensslCmds).pipe(
@@ -120,7 +121,7 @@ describe(filename, () => {
         .subscribe()
     })
 
-    it('Should no stderr output with nagetive bufMaxSize (use default value)', done => {
+    it('Should no stderr output with nagetive bufMaxSize (use default value)', (done) => {
       const stderrMaxBufferSize = -1
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(opensslCmds).pipe(
@@ -151,7 +152,7 @@ describe(filename, () => {
       shell: true,
     }
 
-    it('Should no output with takeUntilNotifier emit never', done => {
+    it('Should no output with takeUntilNotifier emit never', (done) => {
       const takeUntilNotifier$ = NEVER
       const skipUntilNotifier$ = of(null).pipe()
       const ret$ = ofrom(fakeCmds).pipe(
@@ -171,7 +172,7 @@ describe(filename, () => {
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
-    it('Should no output with takeUntilNotifier emit immediately', done => {
+    it('Should no output with takeUntilNotifier emit immediately', (done) => {
       const takeUntilNotifier$ = of('foo', 'bar')
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(fakeCmds).pipe(
@@ -190,7 +191,7 @@ describe(filename, () => {
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
-    it('Should output with takeUntilNotifier emit dalay', done => {
+    it('Should output with takeUntilNotifier emit dalay', (done) => {
       const takeUntilNotifier$ = of('foo', 'bar').pipe(delay(2000))
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(fakeCmds).pipe(
@@ -220,7 +221,7 @@ describe(filename, () => {
       shell: true,
     }
 
-    it('Should no output with skipUntilNotifier emit never', done => {
+    it('Should no output with skipUntilNotifier emit never', (done) => {
       const takeUntilNotifier$ = of(null).pipe(delay(2000))
       const skipUntilNotifier$ = NEVER
       const ret$ = ofrom(fakeCmds).pipe(
@@ -238,7 +239,7 @@ describe(filename, () => {
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
-    it('Should output with skipUntilNotifier emit immediately', done => {
+    it('Should output with skipUntilNotifier emit immediately', (done) => {
       const takeUntilNotifier$ = of(null).pipe(delay(2000))
       const skipUntilNotifier$ = of(void 0)
       const ret$ = ofrom(fakeCmds).pipe(
@@ -256,7 +257,7 @@ describe(filename, () => {
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
-    it('Should output with skipUntilNotifier emit dalay before takeUntilNotifier', done => {
+    it('Should output with skipUntilNotifier emit dalay before takeUntilNotifier', (done) => {
       const takeUntilNotifier$ = of('foo', 'bar').pipe(delay(2000))
       const skipUntilNotifier$ = of(void 0).pipe(delay(1000))
       const ret$ = ofrom(fakeCmds).pipe(
@@ -275,7 +276,7 @@ describe(filename, () => {
       ret$.pipe(finalize(() => done())).subscribe()
     })
 
-    it('Should output with skipUntilNotifier emit dalay after takeUntilNotifier', done => {
+    it('Should output with skipUntilNotifier emit dalay after takeUntilNotifier', (done) => {
       const takeUntilNotifier$ = of('foo', 'bar').pipe(delay(2000))
       const skipUntilNotifier$ = of(void 0).pipe(delay(3000))
       const ret$ = ofrom(fakeCmds).pipe(
@@ -305,12 +306,12 @@ function assertNoStderrOutputBindStderrData(
   spawnOpts: RxRunFnArgs[2],
   takeUntilNotifier$: Observable<any>,
   skipUntilNotifier$: Observable<any>,
-  timeoutVal: number = 5000,
+  timeoutVal = 5000,
 ) {
 
   const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
-    tap(buf => {
+    tap((buf) => {
       assert(false, 'Should not emit data' + buf.toString())
     }),
     timeout(timeoutVal),
@@ -331,7 +332,7 @@ function assertWithStderrOutputBindStderrData(
 ) {
   const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
-    tap(buf => {
+    tap((buf) => {
       assert(buf && buf.byteLength > 0, 'Should emit data, but byteLength zero')
     }),
     timeout(15000),
@@ -345,12 +346,12 @@ function assertNoStderrOutput(
 
   const random = Math.random().toString()
   const ret$ = obb$.pipe(
-    tap(buf => {
+    tap((buf) => {
       assert(false, 'Should not output from stderr. But got:' + buf.toString())
     }),
     timeout(3000),
     catchError(() => of(Buffer.from(random))),
-    tap(buf => {
+    tap((buf) => {
       assert(buf.toString() === random, 'Should got error thrown by timeout()')
     }),
   )

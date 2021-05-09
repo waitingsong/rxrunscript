@@ -1,4 +1,5 @@
 import { spawn, ChildProcess, SpawnOptions } from 'child_process'
+
 import { of, throwError, Observable } from 'rxjs'
 import { catchError, mergeMap } from 'rxjs/operators'
 
@@ -8,7 +9,7 @@ import { RxRunFnArgs } from './model'
 import { processOpts } from './prepare'
 
 
- /**
+/**
   * Reactive Running of Command Script
   * @param command {string}
   * @param args {string[]|null}
@@ -32,7 +33,7 @@ export function run(
 
   const proc$ = runSpawn(opts.command, opts.args, opts.spawnOpts)
   const ret$ = proc$.pipe(
-    mergeMap(proc => {
+    mergeMap((proc) => {
       return bindEvent(
         proc,
         opts.spawnOpts.stderrMaxBufferSize,
@@ -43,7 +44,7 @@ export function run(
     }),
     catchError((err: Error) => {
       const msg = err.message
-      if (msg.indexOf(errPrefix) !== 0 && msg.indexOf(stderrPrefix) !== 0) {
+      if (! msg.startsWith(errPrefix) && ! msg.startsWith(stderrPrefix)) {
         err.message = `${errPrefix} ${errScript}\n` + msg
       }
       throw err

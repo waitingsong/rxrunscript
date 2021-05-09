@@ -1,4 +1,5 @@
 import { ChildProcess } from 'child_process'
+
 import { merge, EMPTY, Observable, Subject } from 'rxjs'
 import {
   catchError,
@@ -21,10 +22,10 @@ export function bindStdinData(
   const err$ = new Subject<Error>()
 
   const input$ = inputData$.pipe(
-    tap(data => {
+    tap((data) => {
       // console.log('bindStdinData:', data)
       // debug in vsc below will cause EPIPE error
-      stdin.write(data, err => {
+      stdin.write(data, (err) => {
         if (err) {
           err$.next(err)
         }

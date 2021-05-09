@@ -1,10 +1,11 @@
 /// <reference types="mocha" />
 
+import { sep } from 'path'
+
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import { sep } from 'path'
 import * as assert from 'power-assert'
 import { concat, from as ofrom, of, EMPTY } from 'rxjs'
 import {
@@ -27,7 +28,7 @@ const filename = basename(__filename)
 
 
 describe(filename, () => {
-  it('Should works running openssl', done => {
+  it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
       ['openssl  version'],
@@ -41,7 +42,7 @@ describe(filename, () => {
       }),
     )
       .subscribe(
-        buf => {
+        (buf) => {
           try {
             console.info(buf)
             const ret = buf.toString()
@@ -51,7 +52,7 @@ describe(filename, () => {
             assert(false, ex)
           }
         },
-        err => {
+        (err) => {
           assert(false, err)
           done()
         },
@@ -60,7 +61,7 @@ describe(filename, () => {
 
   })
 
-  it('Should works running openssl with invalid args', done => {
+  it('Should works running openssl with invalid args', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl fake'],
       ['openssl ', ['fake'] ],
@@ -71,24 +72,24 @@ describe(filename, () => {
       }),
     )
       .subscribe(
-        buf => {
+        (buf) => {
           try {
             const ret = buf.toString()
-            assert(!ret.includes('OpenSSL'), `should got error but got result: "${ret}"`)
+            assert(! ret.includes('OpenSSL'), `should got error but got result: "${ret}"`)
           }
           catch (ex) {
             assert(true)
           }
         },
-        err => {
+        (err) => {
           assert(true)
           done()
         },
         done,
-    )
+      )
   })
 
-  it('Should throw error with unknown command', done => {
+  it('Should throw error with unknown command', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['fakefoo'],
       ['fakefoo ', ['fake'] ],
@@ -98,7 +99,7 @@ describe(filename, () => {
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap(buf => {
+          tap((buf) => {
             assert(false, 'Should not got data from stdout' + buf.toString())
           }),
           catchError((err: Error) => {
@@ -132,7 +133,7 @@ describe(filename, () => {
     ['ts-node ', [file, count.toString()], options],
   ]
 
-  it('Should works running interval-source.ts with random count serially', done => {
+  it('Should works running interval-source.ts with random count serially', (done) => {
     if (process.platform === 'win32') {
       console.info('skip test under win32')
       return done()
@@ -149,7 +150,7 @@ describe(filename, () => {
     ).subscribe()
   })
 
-  it('Should works running interval-source.ts with random count parallelly', done => {
+  it('Should works running interval-source.ts with random count parallelly', (done) => {
     if (process.platform === 'win32') {
       console.info('skip test under win32')
       return done()
@@ -178,11 +179,11 @@ describe(filename, () => {
     return
   }
 
-  it(`Should running "${file}" works`, done => {
+  it(`Should running "${file}" works`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     const cmds: RxRunFnArgs[] = [
-      [`./test/${file} ${ Math.random().toString() } `],
+      [`./test/${file} ${Math.random().toString()} `],
 
       [`./test/${file}`, [Math.random().toString()] ],
       [`./test/${file}`, [Math.random().toString(), '--'] ],
@@ -195,11 +196,11 @@ describe(filename, () => {
     const ret$ = ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap(buf => {
+          tap((buf) => {
             const ret = buf.toString().trim()
             assert(ret && ret.includes(file))
             if (args && args[0]) {
-              assert(ret.includes(<string> args[0]))
+              assert(ret.includes(args[0]))
             }
           }),
         )
@@ -224,7 +225,7 @@ describe(filename, () => {
   console.info('Current path:', __dirname)
   console.info('process.cwd:', process.cwd())
 
-  it(`Should running "${file}" works without Permission`, done => {
+  it(`Should running "${file}" works without Permission`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     // must inner it()
@@ -241,7 +242,7 @@ describe(filename, () => {
     const ret$ = ofrom(cmds).pipe(
       concatMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap(buf => {
+          tap((buf) => {
             const ret = buf.toString().trim()
             assert(! ret.includes('OpenSSL '), `Should not output OpenSSL version. But result: "${ret}"`)
           }),
@@ -263,7 +264,7 @@ describe(filename, () => {
       .subscribe()
   })
 
-  it(`Should running "${file}" works`, done => {
+  it(`Should running "${file}" works`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     const isTravis = __dirname.includes('travis')
@@ -285,7 +286,7 @@ describe(filename, () => {
     ]
     const ret$ = ofrom(cmds).pipe(
       filter(([cmd, args], index) => {
-        console.info(`\nStarting cmds: "${cmd}"`, (args && args.length ? args[0] : ''))
+        console.info(`\nStarting cmds: "${cmd}"`, args && args.length ? args[0] : '')
         const skipped = ! isTravis
         if (isTravis) {
           console.info(
@@ -297,7 +298,7 @@ describe(filename, () => {
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
           defaultIfEmpty(Buffer.from('foo')),
-          tap(buf => {
+          tap((buf) => {
             const ret = buf.toString().trim()
             console.info('Runner script result:' + ret)
             assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
@@ -316,7 +317,7 @@ describe(filename, () => {
 
 
 describe(filename, () => {
-  it('Should works without any output', done => {
+  it('Should works without any output', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['cd /'],
       ['cd ..'],
@@ -334,9 +335,9 @@ describe(filename, () => {
     )
       .subscribe(
         (buf: Buffer) => {
-          assert(!buf.byteLength, 'Should result empty, but got: ' + buf.toString())
+          assert(! buf.byteLength, 'Should result empty, but got: ' + buf.toString())
         },
-        err => {
+        (err) => {
           assert(false, err)
           done()
         },

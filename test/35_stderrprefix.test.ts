@@ -22,42 +22,42 @@ describe(filename, () => {
 
   describe('Should stderrPrefix works', () => {
 
-    it('with blank value', done => {
+    it('with blank value', (done) => {
       const stderrPrefix = ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('with random value', done => {
+    it('with random value', (done) => {
       const stderrPrefix = Math.random() + ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('with random value (lf)', done => {
+    it('with random value (lf)', (done) => {
       const stderrPrefix = Math.random() + '\n\n\n\n'
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('with bank value', done => {
+    it('with bank value', (done) => {
       const stderrPrefix = ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('works with random value', done => {
+    it('works with random value', (done) => {
       const stderrPrefix = Math.random() + ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('works with random value (lf)', done => {
+    it('works with random value (lf)', (done) => {
       const stderrPrefix = Math.random() + '\n'
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 

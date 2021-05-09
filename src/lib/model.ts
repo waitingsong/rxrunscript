@@ -1,5 +1,7 @@
 import { SpawnOptions } from 'child_process'
+
 import { Observable } from 'rxjs'
+
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
@@ -31,11 +33,11 @@ export interface MsgPrefixOpts {
 }
 
 export interface RxRunFnArgs extends
-  Array<string | ReadonlyArray<string> | Partial<RxSpawnOpts> | null | void> {
+  Array<string | readonly string[] | Partial<RxSpawnOpts> | null | void> {
   /** command */
   0: string
   /** args */
-  1?: ReadonlyArray<string> | null
+  1?: readonly string[] | null
   2?: Partial<RxSpawnOpts> | null
 }
 
@@ -45,9 +47,9 @@ export interface RxRunFnArgs extends
  */
 export interface ProcCloseOrExitCodeSignal extends Array<number | string | null> {
   /** code */
-  0: number | null,
+  0: number | null
   /** signal */
-  1: string | null,
+  1: string | null
 }
 
 

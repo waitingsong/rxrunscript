@@ -1,7 +1,10 @@
 import { SpawnOptions } from 'child_process'
+
 import * as assert from 'power-assert'
 import { from as ofrom, of, Observable } from 'rxjs'
-import { catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap } from 'rxjs/operators'
+import {
+  catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
+} from 'rxjs/operators'
 
 import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
 
@@ -113,7 +116,7 @@ export function testStderrPrefixWithExitError(
   ofrom(cmdArr).pipe(
     concatMap(([cmd, args, opts]) => {
       return run(cmd, args, opts).pipe(
-        tap(buf => {
+        tap((buf) => {
           if (buf && buf.byteLength) {
             assert(false, 'Should not got stdout data:' + buf.toString())
           }
@@ -138,7 +141,7 @@ export function testOpensslStderrPrefixWithExitError(
   ofrom(cmdArr).pipe(
     concatMap(([cmd, args, opts]) => {
       return run(cmd, args, opts).pipe(
-        tap(buf => {
+        tap((buf) => {
           assert(false, 'Should not got stdout data:' + buf.toString())
         }),
         catchError((err: Error) => {
@@ -160,10 +163,10 @@ export function testIntervalSource(
 
   return run(cmd, args, opts).pipe(
     map(buf => buf.toString()),
-    tap(ret => {
+    tap((ret) => {
       console.log('got:', ret.trim())
     }),
-    concatMap(ret => {
+    concatMap((ret) => {
       const arr = ret.split(/\s+/)
       // console.log('arr:', arr)
       return ofrom(arr).pipe(
@@ -175,7 +178,7 @@ export function testIntervalSource(
       acc.push(curr)
       return acc
     }, []),
-    tap(arr => {
+    tap((arr) => {
       assert(arr.length === count, `should got array with ${count} items but got: ${arr.length}`)
     }),
   )
@@ -193,11 +196,12 @@ export function assertOpensslWithStderrOutput(
       return acc
     }, []),
     map(arr => Buffer.concat(arr)),
-    tap(buf => {
+    tap((buf) => {
       const ret = buf.toString().trim()
       assert(
-        !ret || ret.indexOf(needle) === 0,
-        `Command: ${cmd}\nGot result: "${ret}"`)
+        ! ret || ret.indexOf(needle) === 0,
+        `Command: ${cmd}\nGot result: "${ret}"`,
+      )
     }),
   )
 }

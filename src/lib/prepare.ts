@@ -57,22 +57,23 @@ function processCommand(
 
   let cmd = command ? command.trim() : ''
   /* istanbul ignore else */
-  if (!cmd) {
+  if (! cmd) {
     throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
 
   const cmdLead = cmd.slice(0, 3).replace(/\\/g, '/')
   /* istanbul ignore else */
-  if (spawnOpts.cwd && (cmdLead === '../' || cmdLead.slice(0, 2) === './')) {
+  if (spawnOpts.cwd && (cmdLead === '../' || cmdLead.startsWith('./'))) {
     cmd = join(spawnOpts.cwd, cmd)
   }
 
   /* istanbul ignore else */
-  if (typeof spawnOpts.maxCmdLength === 'number' &&
-    spawnOpts.maxCmdLength > 0 &&
-    cmd.length > spawnOpts.maxCmdLength) {
+  if (typeof spawnOpts.maxCmdLength === 'number'
+    && spawnOpts.maxCmdLength > 0
+    && cmd.length > spawnOpts.maxCmdLength) {
     throw new TypeError(
-      `${errPrefix}\nCommand length exceed ${spawnOpts.maxCmdLength}\n` + cmd.slice(1024) + ' ...')
+      `${errPrefix}\nCommand length exceed ${spawnOpts.maxCmdLength}\n` + cmd.slice(1024) + ' ...',
+    )
   }
 
   return cmd

@@ -1,4 +1,5 @@
 import { ChildProcess } from 'child_process'
+
 import { merge, of, race, EMPTY, Observable } from 'rxjs'
 import {
   defaultIfEmpty,
@@ -6,7 +7,7 @@ import {
   mergeMap,
   shareReplay,
   tap,
- } from 'rxjs/operators'
+} from 'rxjs/operators'
 
 import { MsgPrefixOpts, RxSpawnOpts } from './model'
 import { bindProcClose } from './proc-close'
@@ -51,7 +52,7 @@ export function bindEvent(
     skipUntilNotifier$,
     stderrMaxBufferSize,
   ).pipe(
-    tap(buf => {
+    tap((buf) => {
       const msg = buf.toString()
       throw new Error(`${stderrPrefix} ${script}\n${msg}`)
     }),

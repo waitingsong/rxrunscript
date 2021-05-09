@@ -1,10 +1,11 @@
 /// <reference types="mocha" />
 
+import { spawn, SpawnOptions } from 'child_process'
+
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import { spawn, SpawnOptions } from 'child_process'
 import * as assert from 'power-assert'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
 import {
@@ -25,7 +26,7 @@ const filename = basename(__filename)
 
 describe(filename, () => {
 
-  it('Should runSpawn() throw Error', done => {
+  it('Should runSpawn() throw Error', (done) => {
     const gid = 123456789
     const ret$ = ofrom(opensslCmds).pipe(
       mergeMap(([cmd, args, options]) => {

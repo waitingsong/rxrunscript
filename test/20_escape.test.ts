@@ -30,8 +30,8 @@ describe(filename, () => {
     ret = escapeShell(command)
     assert(ret === expect, ret)
 
-    command = "'"
-    expect = "\\'"
+    command = '\''
+    expect = '\\\''
     ret = escapeShell(command)
     assert(ret === expect, ret)
 
