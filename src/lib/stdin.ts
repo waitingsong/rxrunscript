@@ -4,6 +4,7 @@ import {
   catchError,
   finalize,
   ignoreElements,
+  map,
   tap,
 } from 'rxjs/operators'
 
@@ -12,6 +13,10 @@ export function bindStdinData(
   stdin: ChildProcess['stdin'],
   inputData$: Observable<any>,
 ): Observable<never> {
+
+  if (! stdin) {
+    throw new Error('stdint null')
+  }
 
   const err$ = new Subject<Error>()
 
@@ -36,11 +41,11 @@ export function bindStdinData(
     }),
   )
 
-  const ret$ = <Observable<never>> merge(
+  const ret$ = merge(
     err$.asObservable(),
     input$,
   ).pipe(
-    tap((err: Error) => { // from err$
+    map((err: Error) => { // from err$
       throw err
     }),
   )

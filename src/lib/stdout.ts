@@ -8,11 +8,15 @@ export function bindStdoutData(
   takeUntilNotifier$: Observable<any>,
 ): Observable<Buffer> {
 
+  if (! stdout) {
+    throw new Error('stdout null')
+  }
+
   const take$ = takeUntilNotifier$.pipe(take(1), shareReplay())
-  const data$ = fromEvent<Buffer>(stdout, 'data').pipe(
+  const data$ = fromEvent(stdout, 'data').pipe(
     // tap(buf => console.info('stdout:', buf.toString())),
     takeUntil(take$),
   )
 
-  return data$
+  return data$ as Observable<Buffer>
 }

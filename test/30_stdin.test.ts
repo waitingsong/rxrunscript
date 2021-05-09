@@ -1,5 +1,3 @@
-/// <reference types="mocha" />
-
 import {
   basename,
   join,
@@ -268,7 +266,11 @@ function genPubKeyFromPrivateKeyForError(
 
   const proc = spawn(cmd, args, spawnOpts)
   const input$ = of(privateKey).pipe(
-    tap(() => proc.stdin.end()), // close stdint
+    tap(() => {
+      assert(proc.stdin)
+      // @ts-expect-error
+      return proc.stdin.end()
+    }), // close stdint
     shareReplay(),
   )
   const takeUntilNotifier$ = input$.pipe(
@@ -312,6 +314,8 @@ function genPubKeyFromPrivateKeyForCloseError(
   const write$ = of(proc.stdin).pipe(
     delay(500),
     tap(stdin => {
+      assert(stdin)
+      // @ts-expect-error
       stdin.write(privateKey)
     }),
     mapTo('write ok'),

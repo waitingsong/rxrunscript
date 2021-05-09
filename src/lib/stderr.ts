@@ -18,6 +18,10 @@ export function bindStderrData(
   bufMaxSize: number,
 ): Observable<Buffer> {
 
+  if (! stderr) {
+    throw new Error('stderr null')
+  }
+
   const take$ = takeUntilNotifier$.pipe(
     take(1),
     shareReplay(),
@@ -28,7 +32,7 @@ export function bindStderrData(
   )
 
   const event$ = bufMaxSize > 0
-    ? fromEvent<Buffer>(stderr, 'data')
+    ? fromEvent(stderr, 'data') as Observable<Buffer>
     : NEVER
 
   const data$ = event$.pipe(
