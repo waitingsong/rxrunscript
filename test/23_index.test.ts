@@ -34,14 +34,14 @@ describe(filename, () => {
   const path = join(__dirname, file)
   const appDirName = __dirname.split(sep).slice(-2, -1)[0]
 
-  // if (process.platform === 'win32') {
-  //   console.info('skip test under win32')
-  //   return
-  // }
+  if (process.platform === 'win32') {
+    console.info('skip test under win32')
+    return
+  }
   console.info('Current path:', __dirname)
   console.info('process.cwd:', process.cwd())
 
-  it.skip(`Should running "${file}" works without Permission`, (done) => {
+  it(`Should running "${file}" works without Permission`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     // must inner it()
