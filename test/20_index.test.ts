@@ -33,7 +33,7 @@ describe(filename, () => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
       ['openssl  version'],
-      ['openssl', ['version'] ],
+      // ['openssl', ['version'] ],
       // ['openssl ', [' version'] ],
     ]
 
