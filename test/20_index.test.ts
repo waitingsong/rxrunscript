@@ -128,6 +128,7 @@ describe(filename, () => {
 
 describe(filename, () => {
   const file = join(__dirname, 'interval-source.ts')
+  const tsConfig = join(__dirname, 'tsconfig.json')
   let count = Math.floor(Math.random() * 10)
   const options = {
     cwd: __dirname, // ! for test/tsconfig.json
@@ -137,9 +138,9 @@ describe(filename, () => {
     count = 3
   }
   const cmds: RxRunFnArgs[] = [
-    [`ts-node ${file} ${count}`, null, options],
-    [' ts-node ', [`${file} ${count}`], options],
-    ['ts-node ', [file, count.toString()], options],
+    [`ts-node -P "${tsConfig}" ${file} ${count}`, null, options],
+    [' ts-node ', [` -P "${tsConfig}" ${file} ${count}`], options],
+    ['ts-node ', [`-P "${tsConfig}"`, file, count.toString()], options],
   ]
 
   it('Should works running interval-source.ts with random count serially', (done) => {
