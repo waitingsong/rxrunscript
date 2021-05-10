@@ -32,7 +32,7 @@ describe(filename, () => {
   it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
-      ['openssl  version'],
+      // ['openssl  version'],
     ]
     if (process.platform === 'win32') {
       cmds.push(
