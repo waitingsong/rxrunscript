@@ -4,7 +4,15 @@ import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
 import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './model'
 
 
-export function processOpts(options: ProcessOpts) {
+
+export interface ProcessOptsRet {
+  command: string
+  args: string[]
+  spawnOpts: RxSpawnOpts
+  errScript: string
+}
+
+export function processOpts(options: ProcessOpts): ProcessOptsRet {
   const { args, initialRxRunOpts } = options
   const spawnOpts: RxSpawnOpts = processSpawnOpts(initialRxRunOpts, options.spawnOpts)
 
@@ -13,6 +21,7 @@ export function processOpts(options: ProcessOpts) {
     initialRxRunOpts.msgPrefixOpts.errPrefix,
     spawnOpts,
   )
+  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
   const runArgs = args && args.length ? [...args] : []
   const errScript = runArgs.length
     ? `"${cmd} ${runArgs.join(' ')}"`
@@ -31,8 +40,7 @@ function processSpawnOpts(
   options?: RxRunFnArgs[2],
 ): RxSpawnOpts {
 
-  const opts = <RxSpawnOpts> (options ? { ...initialSpawnOpts, ...options } : initialSpawnOpts)
-
+  const opts = (options ? { ...initialSpawnOpts, ...options } : initialSpawnOpts) as RxSpawnOpts
   opts.shell = true
   /* istanbul ignore next */
   if (process.platform === 'win32') {

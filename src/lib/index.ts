@@ -65,11 +65,12 @@ function runSpawn(
     return of(proc)
   }
   catch (ex) {
-    return throwError(ex)
+    return throwError(() => ex as Error)
   }
 }
 
 
 export function escapeShell(cmd: string): string {
-  return cmd.replace(/(["\s'$`\\])/g, '\\$1')
+  return cmd.replace(/(["\s'$`\\])/ug, '\\$1')
 }
+

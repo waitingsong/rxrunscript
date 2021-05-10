@@ -42,7 +42,7 @@ export function bindStderrData(
     // tap(buf => console.info('inner stderr1', buf.toString(), buf.byteLength)),
     buffer(take$),
     // buffer() may emit blank data, so filter
-    filter(arr => !! (arr && arr.length > 0)),
+    filter(arr => arr.length > 0),
     // map(Buffer.concat), // !! works not output empty array
     map(arr => Buffer.concat(arr)),
   )

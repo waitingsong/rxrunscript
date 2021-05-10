@@ -18,7 +18,7 @@ export interface RxSpawnOpts extends SpawnOptionsPatical {
   /**
    * emit data with subprocess.stdin.write()
    */
-  inputStream?: Observable<any>
+  inputStream?: Observable<unknown>
   /**
    * Maximum length of command.
    * 0: unlimited.

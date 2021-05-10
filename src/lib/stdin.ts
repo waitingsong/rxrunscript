@@ -12,7 +12,7 @@ import {
 
 export function bindStdinData(
   stdin: ChildProcess['stdin'],
-  inputData$: Observable<any>,
+  inputData$: Observable<unknown>,
 ): Observable<never> {
 
   if (! stdin) {
