@@ -32,7 +32,7 @@ describe(filename, () => {
   it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
-      // ['openssl  version'],
+      ['openssl  version'],
     ]
     if (process.platform === 'win32') {
       cmds.push(
@@ -48,7 +48,7 @@ describe(filename, () => {
           opts.cwd = 'c:/Program Files/Git/mingw64/bin'
         }
         return run(cmd, args, opts)
-      }),
+      }, 1),
     )
       .subscribe({
         next: (buf) => {
