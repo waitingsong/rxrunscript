@@ -146,7 +146,13 @@ describe(filename, () => {
     console.info('start test count serially:', count)
 
     ofrom(cmds).pipe(
-      concatMap(([cmd, args, opts]) => testIntervalSource(cmd, args, opts, count)),
+      concatMap(([cmd, args, options2]) => {
+        const opts = { ...options2 }
+        if (process.platform === 'win32') {
+          opts.cwd = 'c:/Program Files/Git/mingw64/bin'
+        }
+        return testIntervalSource(cmd, args, opts, count)
+      }),
       finalize(() => done()),
       catchError((err: Error) => {
         assert(false, err.message)
@@ -163,7 +169,14 @@ describe(filename, () => {
     console.info('start test count parallelly:', count)
 
     ofrom(cmds).pipe(
-      mergeMap(([cmd, args, opts]) => testIntervalSource(cmd, args, opts, count)),
+      // mergeMap(([cmd, args, opts]) => testIntervalSource(cmd, args, opts, count)),
+      mergeMap(([cmd, args, options2]) => {
+        const opts = { ...options2 }
+        if (process.platform === 'win32') {
+          opts.cwd = 'c:/Program Files/Git/mingw64/bin'
+        }
+        return testIntervalSource(cmd, args, opts, count)
+      }),
       finalize(() => done()),
       catchError((err: Error) => {
         assert(false, err.message)
