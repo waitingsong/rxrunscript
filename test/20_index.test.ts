@@ -8,13 +8,9 @@ import {
 import { concat, from as ofrom, of, EMPTY } from 'rxjs'
 import {
   catchError,
-  concatMap,
-  defaultIfEmpty,
-  filter,
   finalize,
   mergeMap,
   tap,
-  timeout,
 } from 'rxjs/operators'
 
 import { run, RxRunFnArgs } from '../src/index'
@@ -27,19 +23,14 @@ import assert = require('power-assert')
 
 const filename = basename(__filename)
 
-
 describe(filename, () => {
   it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
       ['openssl  version'],
+      ['openssl', ['version'] ],
+      ['openssl ', [' version'] ],
     ]
-    if (process.platform === 'win32') {
-      cmds.push(
-        ['openssl', ['version'] ],
-        ['openssl ', [' version'] ],
-      )
-    }
 
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, options]) => {
@@ -48,7 +39,7 @@ describe(filename, () => {
           opts.cwd = 'c:/Program Files/Git/mingw64/bin'
         }
         return run(cmd, args, opts)
-      }, 1),
+      }, 1), // parallel may cause empty result!
     )
       .subscribe({
         next: (buf) => {
@@ -78,7 +69,7 @@ describe(filename, () => {
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts)
-      }),
+      }, 1),
     )
       .subscribe({
         next: (buf) => {
@@ -115,7 +106,7 @@ describe(filename, () => {
             return of(Buffer.from(''))
           }),
         )
-      }),
+      }, 1),
       finalize(() => {
         done()
       }),
