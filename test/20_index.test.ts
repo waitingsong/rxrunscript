@@ -33,9 +33,13 @@ describe(filename, () => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
       ['openssl  version'],
-      // ['openssl', ['version'] ],
-      // ['openssl ', [' version'] ],
     ]
+    if (process.platform === 'win32') {
+      cmds.push(
+        ['openssl', ['version'] ],
+        ['openssl ', [' version'] ],
+      )
+    }
 
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, options]) => {
@@ -76,8 +80,8 @@ describe(filename, () => {
         return run(cmd, args, opts)
       }),
     )
-      .subscribe(
-        (buf) => {
+      .subscribe({
+        next: (buf) => {
           try {
             const ret = buf.toString()
             assert(! ret.includes('OpenSSL'), `should got error but got result: "${ret}"`)
@@ -86,12 +90,12 @@ describe(filename, () => {
             assert(true)
           }
         },
-        (err) => {
+        error: (err) => {
           assert(true)
           done()
         },
-        done,
-      )
+        complete: () => done(),
+      })
   })
 
   it('Should throw error with unknown command', (done) => {
