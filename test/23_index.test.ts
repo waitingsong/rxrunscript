@@ -95,8 +95,8 @@ describe(filename, () => {
     )
 
     const cmds: RxRunFnArgs[] = [
-      ['sh', [path] ],
-      // [path],
+      // ['sh', [path] ],
+      [path],
       // [`./test/${file}`],
       // [`../${appDirName}/test/${file}`],
     ]
