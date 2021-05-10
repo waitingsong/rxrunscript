@@ -96,6 +96,58 @@ describe(filename, () => {
 
     const cmds: RxRunFnArgs[] = [
       ['sh', [path] ],
+      // [path],
+      // [`./test/${file}`],
+      // [`../${appDirName}/test/${file}`],
+    ]
+    const ret$ = ofrom(cmds).pipe(
+      filter(([cmd, args], index) => {
+        console.info(`\nStarting cmds: "${cmd}"`, args && args.length ? args[0] : '')
+        const skipped = ! isTravis
+        if (isTravis) {
+          console.info(
+            `Skip "${cmd}" under travis cause of file will not found. But test passed under local test!`,
+          )
+        }
+        return skipped
+      }),
+      mergeMap(([cmd, args, opts]) => {
+        return run(cmd, args, opts).pipe(
+          defaultIfEmpty(Buffer.from('foo')),
+          tap((buf) => {
+            const ret = buf.toString().trim()
+            console.info('Runner script result:' + ret)
+            console.info('Runner script result buf:', buf)
+            console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
+            assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
+          }),
+          timeout(5000),
+        )
+      }, 1),
+      finalize(() => done()),
+    )
+
+    concat(chmod$, ls$, cat$, ret$)
+      .pipe(timeout(50000))
+      .subscribe()
+  })
+
+  it.skip(`Should running "${file}" works`, (done) => {
+    assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
+
+    const isTravis = __dirname.includes('travis')
+
+    // must inner it()
+    const chmod$ = run('chmod a+x', [path])
+    const ls$ = run('ls -al', [path]).pipe(
+      tap(buf => console.log('file should has x rights:\n', buf.toString())),
+    )
+    const cat$ = run('cat', [path]).pipe(
+      tap(buf => console.log('cat file result:\n', buf.toString())),
+    )
+
+    const cmds: RxRunFnArgs[] = [
+      // ['sh', [path] ],
       [path],
       [`./test/${file}`],
       [`../${appDirName}/test/${file}`],
@@ -131,5 +183,6 @@ describe(filename, () => {
       .pipe(timeout(50000))
       .subscribe()
   })
+
 })
 

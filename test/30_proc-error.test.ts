@@ -34,8 +34,9 @@ describe(filename, () => {
         opts.gid = gid
 
         return run(cmd, args, opts).pipe(
-          tap(() => {
-            assert(false, 'Should not got stdout')
+          tap((buf) => {
+            console.warn(buf.toString())
+            assert(false, 'Should error thrown, but got data')
           }),
           catchError((err: Error) => {
             assetRunError(err, initialMsgPrefixOpts.errPrefix)
