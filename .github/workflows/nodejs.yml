@@ -42,8 +42,6 @@ jobs:
           CI: true
       - name: npm ci
         run: |
-          # lint must after build
-          ls -al test
           npm run lint:nofix
           npm run ci
         env:
