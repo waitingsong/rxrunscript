@@ -31,8 +31,8 @@ const filename = basename(__filename)
 describe(filename, () => {
   it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
-      ['openssl version'],
-      // ['openssl  version'],
+      // ['openssl version'],
+      ['openssl  version'],
       // ['openssl', ['version'] ],
       // ['openssl ', [' version'] ],
     ]
