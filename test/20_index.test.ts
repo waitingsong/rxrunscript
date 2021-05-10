@@ -1,3 +1,4 @@
+import { error } from 'console'
 import { sep } from 'path'
 
 import {
@@ -37,27 +38,31 @@ describe(filename, () => {
     ]
 
     ofrom(cmds).pipe(
-      mergeMap(([cmd, args, opts]) => {
+      mergeMap(([cmd, args, options]) => {
+        const opts = { ...options }
+        if (process.platform === 'win32') {
+          opts.cwd = 'c:/Program Files/Git/mingw64/bin'
+        }
         return run(cmd, args, opts)
       }),
     )
-      .subscribe(
-        (buf) => {
+      .subscribe({
+        next: (buf) => {
           try {
             console.info(buf)
             const ret = buf.toString()
-            assert(ret.includes('OpenSSL'), `result: "${ret}"`)
+            assert(ret && ret.includes('OpenSSL'), `result: "${ret}"`)
           }
           catch (ex) {
             assert(false, ex)
           }
         },
-        (err) => {
+        error: (err) => {
           assert(false, err)
           done()
         },
-        done,
-      )
+        complete: () => done(),
+      })
 
   })
 
@@ -301,6 +306,7 @@ describe(filename, () => {
           tap((buf) => {
             const ret = buf.toString().trim()
             console.info('Runner script result:' + ret)
+            console.info('Runner script result buf:', buf)
             assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
           }),
           timeout(5000),
@@ -333,16 +339,19 @@ describe(filename, () => {
         )
       }),
     )
-      .subscribe(
-        (buf: Buffer) => {
+      .subscribe({
+        next: (buf: Buffer) => {
           assert(! buf.byteLength, 'Should result empty, but got: ' + buf.toString())
         },
-        (err) => {
+        error: (err) => {
           assert(false, err)
           done()
         },
-        done,
-      )
+        complete: () => {
+          done()
+        },
+      })
 
   })
 })
+
