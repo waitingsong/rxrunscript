@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unpublished-import */
 import { spawn, SpawnOptions } from 'child_process'
 
 import {
@@ -31,14 +32,8 @@ import { bindStderrData } from '../src/lib/stderr'
 import { bindStdinData } from '../src/lib/stdin'
 import { bindStdoutData } from '../src/lib/stdout'
 
-import {
-  assertOpensslWithStderrOutput,
-  opensslCmds,
-} from './helper'
-
 
 const filename = basename(__filename)
-
 
 describe(filename, () => {
 
@@ -46,6 +41,9 @@ describe(filename, () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
+    }
+    if (process.platform === 'win32') {
+      spawnOpts.cwd = 'c:/Program Files/Git/mingw64/bin'
     }
 
     it('Should got pubkey', (done) => {
@@ -77,7 +75,9 @@ describe(filename, () => {
       const pass: string = Math.random().toString()
       const keyBits = 2048
       const ret$ = genRSAKey(pass, keyBits).pipe(
-        mergeMap(pkey => genPubKeyFromPrivateKeyForError(pkey, pass, 'rsa', spawnOpts)),
+        mergeMap((pkey) => {
+          return genPubKeyFromPrivateKeyForError(pkey, pass, 'rsa', spawnOpts)
+        }),
         catchError((err: Error) => {
           assert(
             err instanceof Error
@@ -109,7 +109,6 @@ describe(filename, () => {
 
       ret$.pipe(finalize(() => done())).subscribe()
     })
-
   })
 })
 
@@ -134,7 +133,6 @@ describe(filename, () => {
   })
 
 })
-
 
 
 function genRSAKey(pass: string, keyBits: number): Observable<string> {
@@ -273,6 +271,7 @@ function genPubKeyFromPrivateKeyForError(
   const input$ = of(privateKey).pipe(
     tap(() => {
       assert(proc.stdin)
+      // close stdin for test write again
       // @ts-expect-error
       return proc.stdin.end()
     }), // close stdint
@@ -388,7 +387,14 @@ function runGenPubKeyFromPrivateKey(
 
 function runOpenssl(args: string[], options?: Partial<RxSpawnOpts>): Observable<string> {
   const script = 'openssl'
-  const ret$ = run(script, args, options)
+  const opts = {
+    ...options,
+  }
+  if (! opts.cwd && process.platform === 'win32') {
+    opts.cwd = 'c:/Program Files/Git/mingw64/bin'
+  }
+
+  const ret$ = run(script, args, opts)
 
   return ret$
     .pipe(

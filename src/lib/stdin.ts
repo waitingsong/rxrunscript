@@ -6,6 +6,7 @@ import {
   finalize,
   ignoreElements,
   map,
+  mergeMap,
   tap,
 } from 'rxjs/operators'
 
@@ -19,37 +20,36 @@ export function bindStdinData(
     throw new Error('stdint null')
   }
 
-  const err$ = new Subject<Error>()
-
   const input$ = inputData$.pipe(
-    tap((data) => {
+    mergeMap((data) => {
       // console.log('bindStdinData:', data)
       // debug in vsc below will cause EPIPE error
-      stdin.write(data, (err) => {
-        if (err) {
-          err$.next(err)
+      return new Promise((done, reject) => {
+        const ended = stdin.writableEnded
+        // prevent "Uncaught Error [ERR_STREAM_WRITE_AFTER_END]: write after end",
+        // even if use try/catch
+        if (ended) {
+          const err = new Error(' write after end')
+          // @ts-expect-error
+          err.code = 'ERR_STREAM_WRITE_AFTER_END'
+          return reject(err)
         }
+
+        stdin.write(data, (err) => {
+          if (err) {
+            reject(err)
+            return
+          }
+          done(data)
+        })
       })
-    }),
-    catchError((err: Error) => {
-      err$.next(err)
-      return EMPTY
     }),
     ignoreElements(),
     finalize(() => {
       stdin.end()
-      err$.complete()
     }),
   )
 
-  const ret$ = merge(
-    err$.asObservable(),
-    input$,
-  ).pipe(
-    map((err: Error) => { // from err$
-      throw err
-    }),
-  )
-
-  return ret$
+  return input$
 }
+
