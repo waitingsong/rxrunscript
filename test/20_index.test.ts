@@ -31,10 +31,10 @@ const filename = basename(__filename)
 describe(filename, () => {
   it('Should works running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
-      // ['openssl version'],
-      // ['openssl  version'],
-      // ['openssl', ['version'] ],
-      ['openssl ', [' version'] ],
+      ['openssl version'],
+      ['openssl  version'],
+      ['openssl', ['version'] ],
+      // ['openssl ', [' version'] ],
     ]
 
     ofrom(cmds).pipe(
@@ -49,7 +49,7 @@ describe(filename, () => {
       .subscribe({
         next: (buf) => {
           try {
-            console.info(buf)
+            console.info('running:', buf)
             const ret = buf.toString()
             assert(ret && ret.includes('OpenSSL'), `result: "${ret}"`)
           }
