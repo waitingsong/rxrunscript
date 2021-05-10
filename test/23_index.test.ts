@@ -86,7 +86,7 @@ describe(filename, () => {
     const isTravis = __dirname.includes('travis')
 
     // must inner it()
-    const chmod$ = run('chmod u+x', [join(__dirname, file)])
+    const chmod$ = run('chmod u+x', [path])
     const ls$ = run('ls -al', [path]).pipe(
       tap(buf => console.log('file should has x rights:\n', buf.toString())),
     )
@@ -118,6 +118,7 @@ describe(filename, () => {
             const ret = buf.toString().trim()
             console.info('Runner script result:' + ret)
             console.info('Runner script result buf:', buf)
+            console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
             assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
           }),
           timeout(5000),
