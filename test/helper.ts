@@ -47,7 +47,7 @@ export const opensslCmds: RxRunFnArgs[] = [
 ]
 
 
-export function assetRunError(err: Error, errPrefix: MsgPrefixOpts['errPrefix']) {
+export function assetRunError(err: Error, errPrefix: MsgPrefixOpts['errPrefix']): void {
   const msg = err ? err.message : ''
   if (msg) {
     if (errPrefix.length) {
@@ -63,7 +63,7 @@ export function assetRunError(err: Error, errPrefix: MsgPrefixOpts['errPrefix'])
 }
 
 
-export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']) {
+export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']): void {
   const msg = err ? err.message : ''
   if (msg) {
     if (stderrPrefix.length) {
@@ -88,7 +88,7 @@ export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['s
   }
 }
 
-export function assertStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']) {
+export function assertStderr(err: Error, stderrPrefix: MsgPrefixOpts['stderrPrefix']): void {
   const msg = err ? err.message : ''
   if (msg) {
     if (stderrPrefix.length) {
@@ -188,20 +188,21 @@ export function assertOpensslWithStderrOutput(
   cmd: RxRunFnArgs[0],
   args?: RxRunFnArgs[1] | null,
   opts?: RxRunFnArgs[2] | null,
-) {
+): Observable<Buffer> {
 
-  return run(cmd, args, opts).pipe(
+  const ret = run(cmd, args, opts).pipe(
     reduce((acc: Buffer[], curr: Buffer) => {
       acc.push(curr)
       return acc
     }, []),
     map(arr => Buffer.concat(arr)),
     tap((buf) => {
-      const ret = buf.toString().trim()
+      const str = buf.toString().trim()
       assert(
-        ! ret || ret.indexOf(needle) === 0,
-        `Command: ${cmd}\nGot result: "${ret}"`,
+        ! str || str.indexOf(needle) === 0,
+        `Command: ${cmd}\nGot result: "${str}"`,
       )
     }),
   )
+  return ret
 }

@@ -1,6 +1,3 @@
-/// <reference types="mocha" />
-
-
 import {
   basename,
   join,
@@ -30,14 +27,14 @@ describe(filename, () => {
     })
 
     it('with random value', (done) => {
-      const stderrPrefix = Math.random() + ''
+      const stderrPrefix = Math.random().toString()
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
     it('with random value (lf)', (done) => {
-      const stderrPrefix = Math.random() + '\n\n\n\n'
+      const stderrPrefix = Math.random().toString() + '\n\n\n\n'
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
@@ -51,14 +48,14 @@ describe(filename, () => {
     })
 
     it('works with random value', (done) => {
-      const stderrPrefix = Math.random() + ''
+      const stderrPrefix = Math.random().toString() + ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
     it('works with random value (lf)', (done) => {
-      const stderrPrefix = Math.random() + '\n'
+      const stderrPrefix = Math.random().toString() + '\n'
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)

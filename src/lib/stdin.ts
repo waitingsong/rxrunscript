@@ -1,13 +1,10 @@
 import { ChildProcess } from 'child_process'
 
-import { merge, EMPTY, Observable, Subject } from 'rxjs'
+import { Observable } from 'rxjs'
 import {
-  catchError,
   finalize,
   ignoreElements,
-  map,
   mergeMap,
-  tap,
 } from 'rxjs/operators'
 
 

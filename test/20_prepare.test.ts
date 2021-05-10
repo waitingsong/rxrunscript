@@ -1,5 +1,3 @@
-/// <reference types="mocha" />
-
 import {
   basename,
   join,
@@ -52,7 +50,7 @@ describe(filename, () => {
     })
 
     it('command length exceed 1000', (done) => {
-      const random = Math.random() + ''
+      const random = Math.random().toString()
 
       ofrom([random.repeat(100)]).pipe(
         mergeMap((cmd) => {

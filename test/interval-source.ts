@@ -1,7 +1,7 @@
 import { interval } from 'rxjs'
+import { take } from 'rxjs/operators'
 import * as yargs from 'yargs'
 
-import { take } from '../node_modules/rxjs/operators'
 
 
 const args = yargs.argv._

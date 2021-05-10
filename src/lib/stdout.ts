@@ -6,7 +6,7 @@ import { shareReplay, take, takeUntil } from 'rxjs/operators'
 
 export function bindStdoutData(
   stdout: ChildProcess['stdout'],
-  takeUntilNotifier$: Observable<any>,
+  takeUntilNotifier$: Observable<unknown>,
 ): Observable<Buffer> {
 
   if (! stdout) {

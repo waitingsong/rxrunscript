@@ -14,8 +14,8 @@ import {
 
 export function bindStderrData(
   stderr: ChildProcess['stderr'],
-  takeUntilNotifier$: Observable<any>,
-  skipUntilNofifier$: Observable<any>,
+  takeUntilNotifier$: Observable<unknown>,
+  skipUntilNofifier$: Observable<unknown>,
   bufMaxSize: number,
 ): Observable<Buffer> {
 

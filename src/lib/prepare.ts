@@ -69,7 +69,7 @@ function processCommand(
     throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
 
-  const cmdLead = cmd.slice(0, 3).replace(/\\/g, '/')
+  const cmdLead = cmd.slice(0, 3).replace(/\\/ug, '/')
   /* istanbul ignore else */
   if (spawnOpts.cwd && (cmdLead === '../' || cmdLead.startsWith('./'))) {
     cmd = join(spawnOpts.cwd, cmd)
