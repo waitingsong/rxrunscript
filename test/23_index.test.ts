@@ -95,10 +95,10 @@ describe(filename, () => {
     )
 
     const cmds: RxRunFnArgs[] = [
-      // ['sh', [path] ],
-      // [path],
-      // [`./test/${file}`],
-      [`../${appDirName}/test/${file}`],
+      ['sh', [path] ],
+      [path],
+      [`./test/${file}`],
+      // [`../${appDirName}/test/${file}`],
     ]
     const ret$ = ofrom(cmds).pipe(
       filter(([cmd, args], index) => {
