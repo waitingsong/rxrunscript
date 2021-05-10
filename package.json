@@ -80,6 +80,13 @@
   "peerDependencies": {
     "rxjs": "7"
   },
+  "files": [
+    "tsconfig.json",
+    "rollup.config.js",
+    "src/**/*.ts",
+    "bin/*.js",
+    "dist"
+  ],
   "scripts": {
     "bp:add": "git remote add bp https://github.com/waitingsong/npm-base",
     "bp:sync": "git fetch bp && git pull --no-edit bp master",
