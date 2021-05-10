@@ -98,7 +98,7 @@ describe(filename, () => {
       ['sh', [path] ],
       [path],
       [`./test/${file}`],
-      // [`../${appDirName}/test/${file}`],
+      [`../${appDirName}/test/${file}`],
     ]
     const ret$ = ofrom(cmds).pipe(
       filter(([cmd, args], index) => {
@@ -123,7 +123,7 @@ describe(filename, () => {
           }),
           timeout(5000),
         )
-      }),
+      }, 1),
       finalize(() => done()),
     )
 
