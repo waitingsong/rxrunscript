@@ -1,12 +1,9 @@
-/// <reference types="mocha" />
-
 import { sep } from 'path'
 
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import * as assert from 'power-assert'
 import { concat, from as ofrom, of, EMPTY } from 'rxjs'
 import {
   catchError,
@@ -22,6 +19,9 @@ import {
 import { run, RxRunFnArgs } from '../src/index'
 
 import { opensslCmds, testIntervalSource } from './helper'
+
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)

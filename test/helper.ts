@@ -1,12 +1,12 @@
-import { SpawnOptions } from 'child_process'
-
-import * as assert from 'power-assert'
 import { from as ofrom, of, Observable } from 'rxjs'
 import {
   catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
 } from 'rxjs/operators'
 
 import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
+
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 export const fakeCmds: RxRunFnArgs[] = [

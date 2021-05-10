@@ -1,7 +1,7 @@
 import { interval } from 'rxjs'
 import { take } from 'rxjs/operators'
-import * as yargs from 'yargs'
-
+// eslint-disable-next-line node/no-unpublished-import
+import yargs from 'yargs'
 
 
 const args = yargs.argv._

@@ -1,28 +1,27 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "charset": "utf8",
     "declaration": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "importHelpers": false,
     "inlineSourceMap": false,
     "module": "ES6",
     "moduleResolution": "node",
     "newLine": "lf",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
-    "outDir": "./dist",
+    "outDir": "dist",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
     "pretty": true,
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2017"
+    "target": "ES2019"
   },
   "include": [
-    "src/**/*"
+    "src/**/*.ts"
   ],
   "exclude": [
     "asset/",

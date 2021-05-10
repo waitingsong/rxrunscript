@@ -1,12 +1,12 @@
-/// <reference types="mocha" />
-
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import * as assert from 'power-assert'
 
 import { escapeShell } from '../src/index'
+
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)

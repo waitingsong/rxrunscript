@@ -4,9 +4,8 @@ import {
   basename,
   join,
 } from '@waiting/shared-core'
-
-
-const assert = require('power-assert')
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)

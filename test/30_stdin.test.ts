@@ -5,10 +5,7 @@ import {
   basename,
   join,
 } from '@waiting/shared-core'
-import * as assert from 'power-assert'
-import {
-  defer, from as ofrom, iif, merge, of, EMPTY, NEVER, Observable,
-} from 'rxjs'
+import { from as ofrom, merge, of, EMPTY, Observable } from 'rxjs'
 import {
   catchError,
   concatMap,
@@ -31,6 +28,9 @@ import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
 import { bindStdinData } from '../src/lib/stdin'
 import { bindStdoutData } from '../src/lib/stdout'
+
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)

@@ -2,8 +2,7 @@ import {
   basename,
   join,
 } from '@waiting/shared-core'
-import * as assert from 'power-assert'
-import { from as ofrom, of, EMPTY } from 'rxjs'
+import { from as ofrom, of } from 'rxjs'
 import { finalize, map, mergeMap, tap } from 'rxjs/operators'
 
 import { ProcessOpts } from '../src/index'
@@ -12,6 +11,8 @@ import { processOpts } from '../src/lib/prepare'
 
 import { assetRunError } from './helper'
 
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)

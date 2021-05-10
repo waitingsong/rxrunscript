@@ -1,12 +1,9 @@
-/// <reference types="mocha" />
-
 import { spawn, SpawnOptions } from 'child_process'
 
 import {
   basename,
   join,
 } from '@waiting/shared-core'
-import * as assert from 'power-assert'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
 import {
   catchError,
@@ -29,6 +26,9 @@ import {
   fakeCmds,
   opensslCmds,
 } from './helper'
+
+// eslint-disable-next-line import/order
+import assert = require('power-assert')
 
 
 const filename = basename(__filename)
