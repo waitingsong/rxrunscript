@@ -4,7 +4,7 @@ import { take } from 'rxjs/operators'
 import yargs from 'yargs'
 
 
-const args = yargs.argv._
+const args = yargs.argv._ as unknown
 const limit = +args[0]
 
 if (Number.isNaN(limit)) {
