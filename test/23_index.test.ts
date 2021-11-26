@@ -43,6 +43,10 @@ describe(filename, () => {
 
   it(`Should running "${file}" works without Permission`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
+    if (! appDirName) {
+      assert(false)
+      return
+    }
 
     // must inner it()
     const chmod$ = run('chmod a-x', [join(__dirname, file)])
@@ -101,7 +105,7 @@ describe(filename, () => {
       // [`../${appDirName}/test/${file}`],
     ]
     const ret$ = ofrom(cmds).pipe(
-      filter(([cmd, args], index) => {
+      filter(([cmd, args]) => {
         console.info(`\nStarting cmds: "${cmd}"`, args && args.length ? args[0] : '')
         const skipped = ! isTravis
         if (isTravis) {
@@ -146,6 +150,11 @@ describe(filename, () => {
       tap(buf => console.log('cat file result:\n', buf.toString())),
     )
 
+    if (! appDirName) {
+      assert(false)
+      return
+    }
+
     const cmds: RxRunFnArgs[] = [
       // ['sh', [path] ],
       [path],
@@ -153,7 +162,7 @@ describe(filename, () => {
       [`../${appDirName}/test/${file}`],
     ]
     const ret$ = ofrom(cmds).pipe(
-      filter(([cmd, args], index) => {
+      filter(([cmd, args]) => {
         console.info(`\nStarting cmds: "${cmd}"`, args && args.length ? args[0] : '')
         const skipped = ! isTravis
         if (isTravis) {

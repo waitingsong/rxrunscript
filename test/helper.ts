@@ -74,13 +74,13 @@ export function assertOnOpensslStderr(err: Error, stderrPrefix: MsgPrefixOpts['s
       const arr = msg2.split(/\r\n|\n|\r/)
       assert(arr.length >= 1)
       const stderr = arr.length >= 1 ? arr[1] : ''
-      assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
+      assert(stderr && (stderr === '.' || /^\.+/.test(stderr) === true), msg)
     }
     else {
       const arr = msg.split(/\r\n|\n|\r/)
       assert(arr.length >= 1)
       const stderr = arr.length > 1 ? arr[1] : ''
-      assert(stderr === '.' || /^\.+/.test(stderr) === true, msg)
+      assert(stderr && (stderr === '.' || /^\.+/.test(stderr) === true), msg)
     }
   }
   else {

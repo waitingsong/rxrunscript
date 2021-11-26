@@ -42,7 +42,7 @@ describe(filename, () => {
             assert(false, 'Should throw error, but not')
           }
           catch (ex) {
-            assetRunError(ex, initialMsgPrefixOpts.errPrefix)
+            assetRunError(ex as Error, initialMsgPrefixOpts.errPrefix)
             return Buffer.from('')
           }
         }),
@@ -70,7 +70,7 @@ describe(filename, () => {
             assert(false, 'Should throw error, but not')
           }
           catch (ex) {
-            assetRunError(ex, initialMsgPrefixOpts.errPrefix)
+            assetRunError(ex as Error, initialMsgPrefixOpts.errPrefix)
             return Buffer.from('')
           }
         }),

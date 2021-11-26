@@ -39,6 +39,10 @@ describe(filename, () => {
 
   it(`Should running "${file}" works`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
+    if (! appDirName) {
+      assert(false)
+      return
+    }
 
     const cmds: RxRunFnArgs[] = [
       [`./test/${file} ${Math.random().toString()} `],

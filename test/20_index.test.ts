@@ -49,11 +49,11 @@ describe(filename, () => {
             assert(ret && ret.includes('OpenSSL'), `result: "${ret}"`)
           }
           catch (ex) {
-            assert(false, ex)
+            assert(false, (ex as Error).message)
           }
         },
-        error: (err) => {
-          assert(false, err)
+        error: (ex) => {
+          assert(false, (ex as Error).message)
           done()
         },
         complete: () => done(),
@@ -81,7 +81,7 @@ describe(filename, () => {
             assert(true)
           }
         },
-        error: (err) => {
+        error: () => {
           assert(true)
           done()
         },
@@ -102,7 +102,7 @@ describe(filename, () => {
           tap((buf) => {
             assert(false, 'Should not got data from stdout' + buf.toString())
           }),
-          catchError((err: Error) => {
+          catchError(() => {
             return of(Buffer.from(''))
           }),
         )
