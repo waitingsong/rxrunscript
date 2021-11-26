@@ -322,6 +322,7 @@ function genPubKeyFromPrivateKeyForCloseError(
       // @ts-expect-error
       stdin.write(privateKey)
     }),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     mapTo('write ok'),
   )
 

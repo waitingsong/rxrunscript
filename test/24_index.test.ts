@@ -50,7 +50,7 @@ describe(filename, () => {
           assert(! buf.byteLength, 'Should result empty, but got: ' + buf.toString())
         },
         error: (err) => {
-          assert(false, err)
+          assert(false, (err as Error).message)
           done()
         },
         complete: () => {
