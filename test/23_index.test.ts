@@ -41,7 +41,7 @@ describe(filename, () => {
   console.info('Current path:', __dirname)
   console.info('process.cwd:', process.cwd())
 
-  it(`Should running "${file}" works without Permission`, (done) => {
+  it.skip(`Should running "${file}" work without Permission`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
     if (! appDirName) {
       assert(false)
@@ -84,7 +84,7 @@ describe(filename, () => {
       .subscribe()
   })
 
-  it(`Should running "${file}" works`, (done) => {
+  it(`Should running "${file}" work`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     const isTravis = __dirname.includes('travis')
@@ -136,7 +136,7 @@ describe(filename, () => {
       .subscribe()
   })
 
-  it.skip(`Should running "${file}" works`, (done) => {
+  it.skip(`Should running "${file}" work`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     const isTravis = __dirname.includes('travis')
