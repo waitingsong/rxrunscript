@@ -63,19 +63,17 @@ function processCommand(
   spawnOpts: RxSpawnOpts,
 ): string {
 
-  let cmd = command ? command.trim() : ''
-  /* istanbul ignore else */
+  let cmd: string | URL = command ? command.trim() : ''
   if (! cmd) {
     throw new TypeError(`${errPrefix}\nRun command is blank`)
   }
 
   const cmdLead = cmd.slice(0, 3).replace(/\\/ug, '/')
-  /* istanbul ignore else */
-  if (spawnOpts.cwd && (cmdLead === '../' || cmdLead.startsWith('./'))) {
+  if (typeof cmd === 'string' && spawnOpts.cwd && typeof spawnOpts.cwd === 'string'
+    && (cmdLead === '../' || cmdLead.startsWith('./'))) {
     cmd = join(spawnOpts.cwd, cmd)
   }
 
-  /* istanbul ignore else */
   if (typeof spawnOpts.maxCmdLength === 'number'
     && spawnOpts.maxCmdLength > 0
     && cmd.length > spawnOpts.maxCmdLength) {
