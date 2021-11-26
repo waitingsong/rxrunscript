@@ -7,24 +7,69 @@ on:
     inputs:
       semver:
         description: 'Leave empty or input major|minor|patch'
-        required: true
+        required: false
         default: ''
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    container: node:16-bullseye
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     strategy:
       matrix:
-        node: [14]
+        node: [16]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          # pulls all commits (needed for lerna / semantic release to correctly version)
+          fetch-depth: "0"
+      - name: Fix for semantic release
+        # pulls all tags (needed for lerna / semantic release to correctly version)
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Cache
+        uses: actions/cache@v2
+        id: cache-lerna
+        env:
+          cache-name: cache-lerna
+        with:
+          path: |
+            node_modules
+            package-lock.json
+            packages/*/.eslintcache
+            packages/*/.vscode
+            packages/*/dist
+            packages/*/node_modules
+            packages/*/package-lock.json
+          key: ${{ runner.OS }}-build-${{ env.cache-name }}-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-${{ github.ref }}-
+
+      - name: Prepare
+        run: |
+          uname -a
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq --yes > /dev/null
+          apt-get upgrade -qq --yes > /dev/null
+          apt-get install -qq --yes --no-install-recommends bash dnsutils git jq locales net-tools wget > /dev/null
+          apt-get install -qq --yes postgresql-client > /dev/null
+          uname -a
+          npm -v && node -v
+          git --version
+          openssl version
+          cat /etc/*release
+          sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen
+          locale-gen
+          locale -a
+
       - name: Verify
         run: |
           echo $GITHUB_REF
@@ -34,27 +79,47 @@ jobs:
           CI: true
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: npm build
+      - name: Build
         run: |
-          openssl version
-          node -v
-          npm i -g nyc rollup
+          whoami
+          export cwd=`pwd`
+          . .scripts/ci/ci-env.sh
+          sh .scripts/ci/ci-prepare.sh
+          sh .github/workflows/fix.sh
+          npm i -g c8 rollup standard-version
+          sh .github/workflows/fix.sh
           npm i
+          sh .github/workflows/fix.sh
           npm run build --if-present
-      - name: npm ci
-        run: |
-          # lint must after build
-          npm run lint:nofix
-          npm run ci
         env:
           CI: true
 
-      - name: npm publish
+      - name: Lint
         run: |
+          export cwd=`pwd`
+          . .scripts/ci/ci-env.sh
+          sh .scripts/ci/ci-prepare.sh
+          npm run lint:nofix
+        env:
+          CI: true
+
+      - name: Testing
+        run: |
+          export cwd=`pwd`
+          . .scripts/ci/ci-env.sh
+          sh .scripts/ci/ci-prepare.sh
+          npm run cov
+        env:
+          CI: true
+
+      - name: NPM Publish
+        run: |
+          export cwd=`pwd`
+          . .scripts/ci/ci-env.sh
+          git restore .
           git config user.name $GITHUB_ACTOR
           git config user.email gh-actions-${GITHUB_ACTOR}@github.com
-          npm i -g standard-version
-          npm run release ${{ github.event.inputs.semver }} 
+          npm run release ${{ github.event.inputs.semver }}
           npm publish
           git push -v origin --follow-tags
         env:

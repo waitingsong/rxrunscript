@@ -1,67 +1,45 @@
 {
-  "name": "rxrunscript",
+  "name": "npm-base",
   "author": "waiting",
-  "version": "6.2.0",
-  "description": "Run shell script in child process, Output Observable<Buffer>",
+  "version": "0.0.1",
+  "description": "npm boilerplate",
   "keywords": [
-    "npm run",
-    "run-script",
-    "rxjs"
+    "种子项目",
+    "typescript",
+    "ts"
   ],
   "bin": {},
   "browser": "",
-  "es2015": "dist/rxrunscript.esm.js",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "es2015": "",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bugs": {
-    "url": "https://github.com/waitingsong/rxrunscript/issues"
+    "url": "https://github.com/waitingsong/npm-base/issues"
   },
-  "homepage": "https://github.com/waitingsong/rxrunscript#readme",
+  "homepage": "https://github.com/waitingsong/npm-base#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/waitingsong/rxrunscript.git"
+    "url": "git+https://github.com/waitingsong/npm-base.git"
   },
   "license": "MIT",
-  "nyc": {
-    "exclude": [
-      "**/*.js",
-      "**/*.test.ts",
-      "**/*.d.ts",
-      "test*",
-      "dist",
-      "src/bin"
-    ],
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "reporter": [
-      "text-summary",
-      "html"
-    ],
-    "all": true
-  },
-  "dependencies": {
-    "@waiting/shared-core": "^14.0.0",
-    "cross-env": "7",
-    "rxjs": "7"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@commitlint/cli": "12",
-    "@commitlint/config-conventional": "12",
-    "@rollup/plugin-commonjs": "19",
+    "@commitlint/cli": "15",
+    "@commitlint/config-conventional": "15",
+    "@rollup/plugin-commonjs": "21",
     "@rollup/plugin-node-resolve": "13",
-    "@types/mocha": "8",
-    "@types/node": "15",
+    "@types/mocha": "9",
+    "@types/node": "16",
     "@types/power-assert": "1",
     "@types/rewire": "2",
     "@types/rimraf": "3",
     "@types/yargs": "17",
-    "@waiting/eslint-config": "6",
+    "@waiting/eslint-config": "^7.1.0",
+    "@waiting/shared-core": "^15.1.0",
     "coveralls": "3",
-    "debug": "^4.1.0",
-    "eslint": "7",
+    "cross-env": "7",
+    "eslint": "8",
     "espower-typescript": "10",
     "intelli-espower-loader": "1",
     "mocha": "9",
@@ -70,46 +48,50 @@
     "rewire": "5",
     "rimraf": "3",
     "rollup-plugin-terser": "7",
-    "ts-node": "10",
-    "typescript": "4",
+    "rxjs": "^7.4.0",
+    "rxrunscript": "6",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "3",
+    "typescript": "^4.5.0",
     "yargs": "17"
   },
   "engines": {
-    "node": ">=14.15.0"
-  },
-  "peerDependencies": {
-    "rxjs": "7"
+    "node": ">=16.13.0"
   },
   "files": [
-    "tsconfig.json",
-    "rollup.config.js",
     "src/**/*.ts",
-    "bin/*.js",
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
-    "bp:add": "git remote add bp https://github.com/waitingsong/npm-base",
-    "bp:sync": "git fetch bp && git pull --no-edit bp master",
+    "bp:add": "git remote add bp https://github.com.cnpmjs.org/waitingsong/npm-base",
+    "bp:sync": "git fetch --all -v && git pull origin && git merge bp/main -m \"Merge remote-tracking branch 'bp/main'\" ",
+    "bp:syncxo": "git fetch --all -v && git pull origin && git merge bp/main -m \"Merge remote-tracking branch 'bp/main'\" -Xours",
     "build": "npm run tsc && npm run rp",
-    "devbuild": "npm run clean && npm run tsc:dev && npm run rp",
-    "ci": "npm run cov",
-    "clean": "rm -rf dist/*",
-    "cov": "cross-env TS_NODE_PROJECT=test/tsconfig.json nyc mocha --parallel=false",
-    "cov:coveralls": "nyc mocha && nyc report --reporter=text-lcov | coveralls",
-    "link_global": "npm link typescript",
+    "clean": "npm run clean:lock & npm run clean:cache & rm -rf dist/* -rf",
+    "clean:cache": "rm -rf .eslintcache .vscode/.tsbuildinfo .vscode/.tsbuildinfo.*",
+    "clean:lock": "rm package-lock.json -f",
+    "cov": "cross-env TS_NODE_PROJECT=test/tsconfig.json c8 mocha --parallel=false",
+    "doc": "typedoc src/index.ts src/lib/index.ts src/lib/model.ts",
     "lint": "eslint --fix --cache {src,test}/**/*.ts",
     "lint:nofix": "eslint --cache {src,test}/**/*.ts",
-    "prepublishOnly": "npm run build",
+    "postinstall": "npm run repo:init",
+    "postpublish": "git push origin --follow-tags",
+    "prepublishOnly": "npm run clean && npm run build",
+    "purge": "npm run clean & rm node_modules -rf & rm package-lock.json -f",
+    "refresh": "npm i && npm run build",
     "release": "standard-version -r",
     "release:first": "standard-version --first-release",
-    "repo:init": "sh .githooks/init-repo.sh",
+    "repo:init": "bash .githooks/init-repo.sh",
     "rp": "rollup -c rollup.config.js",
     "rp:w": "npm run tsc:w | rollup -wc rollup.config.js",
     "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha",
     "test:browser": "cd .config && npm run browser && cd ..",
-    "test:debug": "cd .config && npm run debug && cd ..",
+    "browser:debug": "cd .config && npm run debug && cd ..",
     "tsc": "tsc -p tsconfig.json",
-    "tsc:dev": "tsc -p tsconfig.dev.json",
     "tsc:w": "tsc -p tsconfig.json -w"
   }
 }
