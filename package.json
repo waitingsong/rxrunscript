@@ -1,29 +1,33 @@
 {
-  "name": "npm-base",
+  "name": "rxrunscript",
   "author": "waiting",
-  "version": "0.0.1",
-  "description": "npm boilerplate",
+  "version": "6.2.0",
+  "description": "Run shell script in child process, Output Observable<Buffer>",
   "keywords": [
-    "种子项目",
-    "typescript",
-    "ts"
+    "npm run",
+    "run-script",
+    "rxjs"
   ],
   "bin": {},
   "browser": "",
-  "es2015": "",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "es2015": "dist/rxrunscript.esm.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bugs": {
-    "url": "https://github.com/waitingsong/npm-base/issues"
+    "url": "https://github.com/waitingsong/rxrunscript/issues"
   },
-  "homepage": "https://github.com/waitingsong/npm-base#readme",
+  "homepage": "https://github.com/waitingsong/rxrunscript#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/waitingsong/npm-base.git"
+    "url": "git+https://github.com/waitingsong/rxrunscript.git"
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@waiting/shared-core": "^15.1.0",
+    "cross-env": "7",
+    "rxjs": "^7.4.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "15",
     "@commitlint/config-conventional": "15",
@@ -49,7 +53,6 @@
     "rimraf": "3",
     "rollup-plugin-terser": "7",
     "rxjs": "^7.4.0",
-    "rxrunscript": "6",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "3",
     "typescript": "^4.5.0",
