@@ -24,7 +24,7 @@ import assert = require('power-assert')
 const filename = basename(__filename)
 
 describe(filename, () => {
-  it('Should works running openssl', (done) => {
+  it('Should work running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],
       ['openssl  version'],
@@ -61,7 +61,7 @@ describe(filename, () => {
 
   })
 
-  it('Should works running openssl with invalid args', (done) => {
+  it('Should work running openssl with invalid args', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl fake'],
       ['openssl ', ['fake'] ],

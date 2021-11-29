@@ -14,7 +14,7 @@ const filename = basename(__filename)
 
 describe(filename, () => {
 
-  it('Should escapeShell works', () => {
+  it('Should escapeShell work', () => {
     let command = ''
     let expect = ''
     let ret = escapeShell(command)

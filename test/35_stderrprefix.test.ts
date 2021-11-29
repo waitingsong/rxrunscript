@@ -17,7 +17,7 @@ describe(filename, () => {
     initialMsgPrefixOpts.stderrPrefix = stderrPrefixOri
   })
 
-  describe('Should stderrPrefix works', () => {
+  describe('Should stderrPrefix work', () => {
 
     it('with blank value', (done) => {
       const stderrPrefix = ''
@@ -47,14 +47,14 @@ describe(filename, () => {
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('works with random value', (done) => {
+    it('work with random value', (done) => {
       const stderrPrefix = Math.random().toString() + ''
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 
       testStderrPrefixWithExitError(fakeCmds, stderrPrefix, done)
     })
 
-    it('works with random value (lf)', (done) => {
+    it('work with random value (lf)', (done) => {
       const stderrPrefix = Math.random().toString() + '\n'
       initialMsgPrefixOpts.stderrPrefix = stderrPrefix
 

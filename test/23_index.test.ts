@@ -1,4 +1,3 @@
-import { error } from 'console'
 import { sep } from 'path'
 
 import {
@@ -19,15 +18,12 @@ import {
 
 import { run, RxRunFnArgs } from '../src/index'
 
-import { opensslCmds, testIntervalSource } from './helper'
 
 // eslint-disable-next-line import/order
 import assert = require('power-assert')
 
 
 const filename = basename(__filename)
-
-
 
 describe(filename, () => {
   const file = 'openssl.sh'
@@ -49,7 +45,7 @@ describe(filename, () => {
     }
 
     // must inner it()
-    const chmod$ = run('chmod a-x', [join(__dirname, file)])
+    const chmod$ = run('chmod u-x', [join(__dirname, file)])
     const ls$ = run('ls -al', [path]).pipe(
       tap(buf => console.log('file should has no x rights:\n', buf.toString())),
     )
@@ -90,7 +86,7 @@ describe(filename, () => {
     const isTravis = __dirname.includes('travis')
 
     // must inner it()
-    const chmod$ = run('chmod a+x', [path])
+    // const chmod$ = run('chmod u+x', [path])
     const ls$ = run('ls -al', [path]).pipe(
       tap(buf => console.log('file should has x rights:\n', buf.toString())),
     )
@@ -131,7 +127,7 @@ describe(filename, () => {
       finalize(() => done()),
     )
 
-    concat(chmod$, ls$, cat$, ret$)
+    concat(ls$, cat$, ret$)
       .pipe(timeout(50000))
       .subscribe()
   })
@@ -142,7 +138,7 @@ describe(filename, () => {
     const isTravis = __dirname.includes('travis')
 
     // must inner it()
-    const chmod$ = run('chmod a+x', [path])
+    const chmod$ = run('chmod +x', [path])
     const ls$ = run('ls -al', [path]).pipe(
       tap(buf => console.log('file should has x rights:\n', buf.toString())),
     )

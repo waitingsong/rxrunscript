@@ -29,7 +29,7 @@ const filename = basename(__filename)
 
 
 describe(filename, () => {
-  it('Should works without any output', (done) => {
+  it('Should work without any output', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['cd /'],
       ['cd ..'],

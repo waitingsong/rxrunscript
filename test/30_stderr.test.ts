@@ -79,7 +79,7 @@ describe(filename, () => {
 
 describe(filename, () => {
 
-  describe('Should bindStderrData() works', () => {
+  describe('Should bindStderrData() work', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
@@ -146,7 +146,7 @@ describe(filename, () => {
 
 describe(filename, () => {
 
-  describe('Should bindStderrData() works with takeUntilNotifier', () => {
+  describe('Should bindStderrData() work with takeUntilNotifier', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
@@ -215,7 +215,7 @@ describe(filename, () => {
 
 describe(filename, () => {
 
-  describe('Should bindStderrData() works with skipUntilNotifier', () => {
+  describe('Should bindStderrData() work with skipUntilNotifier', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,

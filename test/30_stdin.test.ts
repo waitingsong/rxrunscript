@@ -37,7 +37,7 @@ const filename = basename(__filename)
 
 describe(filename, () => {
 
-  describe('Should bindStdinData() works', () => {
+  describe('Should bindStdinData() work', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,
@@ -115,7 +115,7 @@ describe(filename, () => {
 
 describe(filename, () => {
 
-  describe('Should stdin works', () => {
+  describe('Should stdin work', () => {
     const spawnOpts: SpawnOptions = {
       windowsVerbatimArguments: true,
       shell: true,

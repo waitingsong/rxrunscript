@@ -19,7 +19,7 @@ const filename = basename(__filename)
 
 
 describe(filename, () => {
-  describe('Should processOpts() works', () => {
+  describe('Should processOpts() work', () => {
 
     it('blank command', (done) => {
       const cmds: string[] = [

@@ -37,7 +37,7 @@ describe(filename, () => {
     return
   }
 
-  it(`Should running "${file}" works`, (done) => {
+  it(`Should running "${file}" work`, (done) => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
     if (! appDirName) {
       assert(false)

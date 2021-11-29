@@ -45,7 +45,7 @@ describe(filename, () => {
     ['ts-node ', [`-P "${tsConfig}"`, file, count.toString()], options],
   ]
 
-  it('Should works running interval-source.ts with random count serially', (done) => {
+  it('Should work running interval-source.ts with random count serially', (done) => {
     if (process.platform === 'win32') {
       console.info('skip test under win32')
       return done()
@@ -68,7 +68,7 @@ describe(filename, () => {
     ).subscribe()
   })
 
-  it('Should works running interval-source.ts with random count parallelly', (done) => {
+  it('Should work running interval-source.ts with random count parallelly', (done) => {
     if (process.platform === 'win32') {
       console.info('skip test under win32')
       return done()
