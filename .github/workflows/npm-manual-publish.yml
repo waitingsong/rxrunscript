@@ -81,6 +81,7 @@ jobs:
       - name: Build
         run: |
           whoami
+          ls -al .scripts/ci
           export cwd=`pwd`
           . .scripts/ci/ci-env.sh
           .scripts/ci/ci-prepare.sh
@@ -107,6 +108,7 @@ jobs:
           export cwd=`pwd`
           . .scripts/ci/ci-env.sh
           .scripts/ci/ci-prepare.sh
+          sh .github/workflows/fix.sh
           npm run cov
         env:
           CI: true
