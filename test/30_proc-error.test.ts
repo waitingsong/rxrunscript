@@ -1,9 +1,6 @@
-import { spawn, SpawnOptions } from 'child_process'
+import assert from 'assert/strict'
+import { relative } from 'path'
 
-import {
-  basename,
-  join,
-} from '@waiting/shared-core'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
 import {
   catchError,
@@ -17,12 +14,8 @@ import { initialMsgPrefixOpts } from '../src/lib/config'
 
 import { assetRunError, opensslCmds } from './helper'
 
-// eslint-disable-next-line import/order
-import assert = require('power-assert')
 
-
-const filename = basename(__filename)
-
+const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 
 describe(filename, () => {
 

@@ -1,12 +1,11 @@
+import assert from 'assert/strict'
+
 import { from as ofrom, of, Observable } from 'rxjs'
 import {
   catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
 } from 'rxjs/operators'
 
 import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
-
-// eslint-disable-next-line import/order
-import assert = require('power-assert')
 
 
 export const fakeCmds: RxRunFnArgs[] = [

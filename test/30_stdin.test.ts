@@ -1,10 +1,8 @@
 /* eslint-disable node/no-unpublished-import */
+import assert from 'assert/strict'
 import { spawn, SpawnOptions } from 'child_process'
+import { relative } from 'path'
 
-import {
-  basename,
-  join,
-} from '@waiting/shared-core'
 import { from as ofrom, merge, of, EMPTY, Observable } from 'rxjs'
 import {
   catchError,
@@ -14,7 +12,6 @@ import {
   finalize,
   last,
   map,
-  mapTo,
   mergeMap,
   reduce,
   shareReplay,
@@ -24,16 +21,12 @@ import {
 } from 'rxjs/operators'
 
 import { run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
-import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
 import { bindStdinData } from '../src/lib/stdin'
 import { bindStdoutData } from '../src/lib/stdout'
 
-// eslint-disable-next-line import/order
-import assert = require('power-assert')
 
-
-const filename = basename(__filename)
+const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 
 describe(filename, () => {
 
@@ -272,7 +265,6 @@ function genPubKeyFromPrivateKeyForError(
     tap(() => {
       assert(proc.stdin)
       // close stdin for test write again
-      // @ts-expect-error
       return proc.stdin.end()
     }), // close stdint
     shareReplay(),
@@ -319,11 +311,9 @@ function genPubKeyFromPrivateKeyForCloseError(
     delay(500),
     tap((stdin) => {
       assert(stdin)
-      // @ts-expect-error
       stdin.write(privateKey)
     }),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    mapTo('write ok'),
+    map(() => 'write ok'),
   )
 
   const input$ = of(privateKey).pipe(

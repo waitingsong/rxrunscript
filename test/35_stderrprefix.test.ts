@@ -1,16 +1,12 @@
-import {
-  basename,
-  join,
-} from '@waiting/shared-core'
+import { relative } from 'path'
 
 import { initialMsgPrefixOpts } from '../src/lib/config'
 
 import { fakeCmds, testStderrPrefixWithExitError } from './helper'
 
 
-const filename = basename(__filename)
+const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 const { stderrPrefix: stderrPrefixOri } = initialMsgPrefixOpts
-
 
 describe(filename, () => {
   after(() => {

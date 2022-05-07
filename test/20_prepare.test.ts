@@ -1,7 +1,6 @@
-import {
-  basename,
-  join,
-} from '@waiting/shared-core'
+import assert from 'assert/strict'
+import { relative } from 'path'
+
 import { from as ofrom, of } from 'rxjs'
 import { finalize, map, mergeMap, tap } from 'rxjs/operators'
 
@@ -11,12 +10,8 @@ import { processOpts } from '../src/lib/prepare'
 
 import { assetRunError } from './helper'
 
-// eslint-disable-next-line import/order
-import assert = require('power-assert')
 
-
-const filename = basename(__filename)
-
+const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 
 describe(filename, () => {
   describe('Should processOpts() work', () => {

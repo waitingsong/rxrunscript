@@ -1,10 +1,6 @@
-import { error } from 'console'
-import { sep } from 'path'
+import assert from 'assert/strict'
+import { relative } from 'path'
 
-import {
-  basename,
-  join,
-} from '@waiting/shared-core'
 import { concat, from as ofrom, of, EMPTY } from 'rxjs'
 import {
   catchError,
@@ -19,14 +15,8 @@ import {
 
 import { run, RxRunFnArgs } from '../src/index'
 
-import { opensslCmds, testIntervalSource } from './helper'
 
-// eslint-disable-next-line import/order
-import assert = require('power-assert')
-
-
-const filename = basename(__filename)
-
+const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 
 describe(filename, () => {
   it('Should work without any output', (done) => {
