@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.1](https://github.com/waitingsong/rxrunscript/compare/v8.0.0...v8.0.1) (2022-05-07)
+
 ## [8.0.0](https://github.com/waitingsong/rxrunscript/compare/v7.0.0...v8.0.0) (2022-05-07)
 
 ## [7.0.0](https://github.com/waitingsong/rxrunscript/compare/v6.2.0...v7.0.0) (2021-11-30)
