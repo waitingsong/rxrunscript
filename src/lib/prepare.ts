@@ -1,8 +1,7 @@
-import { join } from '@waiting/shared-core'
+import { join } from 'path'
 
 import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
 import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './model'
-
 
 
 export interface ProcessOptsRet {
