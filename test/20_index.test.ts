@@ -35,11 +35,13 @@ describe(filename, () => {
       }, 1), // parallel may cause empty result!
     )
       .subscribe({
-        next: (buf) => {
+        next: (val) => {
           try {
-            console.info('running:', buf)
-            const ret = buf.toString()
-            assert(ret && ret.includes('OpenSSL'), `result: "${ret}"`)
+            console.info('running:', val)
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString()
+              assert(ret && ret.includes('OpenSSL'), `result: "${ret}"`)
+            }
           }
           catch (ex) {
             assert(false, (ex as Error).message)
@@ -65,10 +67,12 @@ describe(filename, () => {
       }, 1),
     )
       .subscribe({
-        next: (buf) => {
+        next: (val) => {
           try {
-            const ret = buf.toString()
-            assert(! ret.includes('OpenSSL'), `should got error but got result: "${ret}"`)
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString()
+              assert(! ret.includes('OpenSSL'), `should got error but got result: "${ret}"`)
+            }
           }
           catch (ex) {
             assert(true)
@@ -92,8 +96,10 @@ describe(filename, () => {
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap((buf) => {
-            assert(false, 'Should not got data from stdout' + buf.toString())
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              assert(false, 'Should not got data from stdout' + val.toString())
+            }
           }),
           catchError(() => {
             return of(Buffer.from(''))

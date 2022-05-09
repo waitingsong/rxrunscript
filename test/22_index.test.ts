@@ -51,11 +51,13 @@ describe(filename, () => {
     const ret$ = ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap((buf) => {
-            const ret = buf.toString().trim()
-            assert(ret && ret.includes(file))
-            if (args && args[0]) {
-              assert(ret.includes(args[0]))
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString().trim()
+              assert(ret && ret.includes(file))
+              if (args && args[0]) {
+                assert(ret.includes(args[0]))
+              }
             }
           }),
         )

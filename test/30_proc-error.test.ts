@@ -27,9 +27,14 @@ describe(filename, () => {
         opts.gid = gid
 
         return run(cmd, args, opts).pipe(
-          tap((buf) => {
-            console.warn(buf.toString())
-            assert(false, 'Should error thrown, but got data')
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              console.warn(val.toString())
+              assert(false, 'Should error thrown, but got data')
+            }
+            else if (val.exitCode === 0) {
+              assert(false, 'Should error thrown, but got exitCode: ' + val.exitCode.toString())
+            }
           }),
           catchError((err: Error) => {
             assetRunError(err, initialMsgPrefixOpts.errPrefix)

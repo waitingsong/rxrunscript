@@ -5,7 +5,7 @@ import {
   catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
 } from 'rxjs/operators'
 
-import { run, MsgPrefixOpts, RxRunFnArgs } from '../src/index'
+import { run, MsgPrefixOpts, RxRunFnArgs, ExitCodeSignal } from '../src/index'
 
 
 export const fakeCmds: RxRunFnArgs[] = [
@@ -115,9 +115,14 @@ export function testStderrPrefixWithExitError(
   ofrom(cmdArr).pipe(
     concatMap(([cmd, args, opts]) => {
       return run(cmd, args, opts).pipe(
-        tap((buf) => {
-          if (buf && buf.byteLength) {
-            assert(false, 'Should not got stdout data:' + buf.toString())
+        tap((val) => {
+          if (Buffer.isBuffer(val)) {
+            if (val.byteLength) {
+              assert(false, 'Should not got stdout data:' + val.toString())
+            }
+          }
+          else if (val.exitCode === 0) {
+            assert(false, 'Should get exitCode not zero but got data:' + val.exitCode.toString())
           }
         }),
         catchError((err: Error) => {
@@ -140,8 +145,11 @@ export function testOpensslStderrPrefixWithExitError(
   ofrom(cmdArr).pipe(
     concatMap(([cmd, args, opts]) => {
       return run(cmd, args, opts).pipe(
-        tap((buf) => {
-          assert(false, 'Should not got stdout data:' + buf.toString())
+        tap((val) => {
+          if (! Buffer.isBuffer(val)) {
+            return
+          }
+          assert(false, 'Should not got stdout data:' + val.toString())
         }),
         catchError((err: Error) => {
           assertOnOpensslStderr(err, stderrPrefix)
@@ -161,7 +169,7 @@ export function testIntervalSource(
 ): Observable<string[]> {
 
   return run(cmd, args, opts).pipe(
-    map(buf => buf.toString()),
+    map(buf => Buffer.isBuffer(buf) ? buf.toString() : ''),
     tap((ret) => {
       console.log('got:', ret.trim())
     }),
@@ -190,8 +198,10 @@ export function assertOpensslWithStderrOutput(
 ): Observable<Buffer> {
 
   const ret = run(cmd, args, opts).pipe(
-    reduce((acc: Buffer[], curr: Buffer) => {
-      acc.push(curr)
+    reduce((acc: Buffer[], curr: Buffer | ExitCodeSignal) => {
+      if (Buffer.isBuffer(curr)) {
+        acc.push(curr)
+      }
       return acc
     }, []),
     map(arr => Buffer.concat(arr)),

@@ -20,7 +20,7 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
+import { ExitCodeSignal, run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
 import { bindStderrData } from '../src/lib/stderr'
 import { bindStdinData } from '../src/lib/stdin'
 import { bindStdoutData } from '../src/lib/stdout'
@@ -363,7 +363,7 @@ function runGenPubKeyFromPrivateKey(
   )
 
   const ret$ = run(cmd, args, { ...spawnOpts, inputStream: input$ }).pipe(
-    map(buf => buf.toString()),
+    map(val => Buffer.isBuffer(val) ? val.toString() : ''),
     defaultIfEmpty('no output'),
     tap((pem) => {
       if (! pem || ! pem.includes('PUBLIC KEY')) {
@@ -389,8 +389,10 @@ function runOpenssl(args: string[], options?: Partial<RxSpawnOpts>): Observable<
 
   return ret$
     .pipe(
-      reduce((acc: Buffer[], curr: Buffer) => {
-        acc.push(curr)
+      reduce((acc: Buffer[], curr: Buffer | ExitCodeSignal) => {
+        if (Buffer.isBuffer(curr)) {
+          acc.push(curr)
+        }
         return acc
       }, []),
       map(arr => Buffer.concat(arr)),

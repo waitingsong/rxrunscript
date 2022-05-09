@@ -13,7 +13,7 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
+import { ExitCodeSignal, run, RxRunFnArgs } from '../src/index'
 
 
 const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
@@ -36,8 +36,10 @@ describe(filename, () => {
       }),
     )
       .subscribe({
-        next: (buf: Buffer) => {
-          assert(! buf.byteLength, 'Should result empty, but got: ' + buf.toString())
+        next: (val: Buffer | ExitCodeSignal) => {
+          if (Buffer.isBuffer(val)) {
+            assert(! val.byteLength, 'Should result empty, but got: ' + val.toString())
+          }
         },
         error: (err) => {
           assert(false, (err as Error).message)
