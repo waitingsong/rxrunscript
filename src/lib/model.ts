@@ -45,12 +45,13 @@ export interface RxRunFnArgs extends
 /**
  * @link - https://nodejs.org/api/child_process.html#child_process_event_close
  */
-export interface ProcCloseOrExitCodeSignal extends Array<number | string | null> {
-  /** code */
-  0: number | null
-  /** signal */
-  1: string | null
+export type ProcCloseOrExitCodeSignal = [ExitCode, ExitSignal]
+export interface ExitCodeSignal {
+  exitCode: number
+  exitSignal: string | null
 }
+export type ExitCode = number
+export type ExitSignal = string | null
 
 
 /** Inner usage for processOpts() */

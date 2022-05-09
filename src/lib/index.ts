@@ -5,7 +5,7 @@ import { catchError, mergeMap } from 'rxjs/operators'
 
 import { bindEvent } from './bindevent'
 import { initialRxRunOpts } from './config'
-import { RxRunFnArgs } from './model'
+import { ExitCodeSignal, RxRunFnArgs } from './model'
 import { processOpts } from './prepare'
 
 
@@ -15,14 +15,14 @@ import { processOpts } from './prepare'
   * @param args {string[]|null}
   * @param options {Partial<RxRunOpts>|null}
   *
-  * @returns Observable<Buffer>
+  * @returns Observable<Buffer | ExitCodeSignal> the last value is the exit code and signal
   * @link https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options
   */
 export function run(
   command: RxRunFnArgs[0],
   args?: RxRunFnArgs[1],
   options?: RxRunFnArgs[2],
-): Observable<Buffer> {
+): Observable<Buffer | ExitCodeSignal> {
 
   const opts = processOpts({
     command, args, spawnOpts: options, initialRxRunOpts,

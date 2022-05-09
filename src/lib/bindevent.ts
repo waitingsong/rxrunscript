@@ -1,6 +1,6 @@
 import { ChildProcess } from 'child_process'
 
-import { merge, of, race, EMPTY, Observable } from 'rxjs'
+import { map, merge, of, race, EMPTY, Observable } from 'rxjs'
 import {
   defaultIfEmpty,
   finalize,
@@ -9,7 +9,7 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { MsgPrefixOpts, RxSpawnOpts } from './model'
+import { ExitCodeSignal, MsgPrefixOpts, ProcCloseOrExitCodeSignal, RxSpawnOpts } from './model'
 import { bindProcClose } from './proc-close'
 import { bindProcError } from './proc-error'
 import { bindProcExit } from './proc-exit'
@@ -24,14 +24,21 @@ export function bindEvent(
   msgPrefixOpts: MsgPrefixOpts,
   script: string, // for throw error
   inputStream: RxSpawnOpts['inputStream'],
-): Observable<Buffer> {
+): Observable<Buffer | ExitCodeSignal> {
 
   const { stderrPrefix } = msgPrefixOpts
 
   const close$ = bindProcClose(proc)
   const exit$ = bindProcExit(proc)
   const closeOrExit$ = race(close$, exit$).pipe(
-    // tap(codeSignal => {
+    map<ProcCloseOrExitCodeSignal, ExitCodeSignal>((data) => {
+      const [exitCode, exitSignal] = data
+      if (typeof exitCode === 'number') {
+        return { exitCode, exitSignal }
+      }
+      return { exitCode: 0, exitSignal }
+    }),
+    // tap((codeSignal) => {
     //   console.log('close or exit event', codeSignal)
     // }),
     shareReplay(1),
@@ -41,8 +48,8 @@ export function bindEvent(
   const error$ = bindProcError(proc, closeOrExit$)
 
   const skipUntilNotifier$ = closeOrExit$.pipe(
-    mergeMap(([code]) => {
-      return code === 0 || code === null ? EMPTY : of(void 0)
+    mergeMap(({ exitCode }) => {
+      return exitCode === 0 ? EMPTY : of(void 0)
     }),
   )
 
@@ -67,6 +74,7 @@ export function bindEvent(
     stderr$,
     stdin$,
     error$,
+    closeOrExit$,
   ).pipe(
     finalize(() => {
       // sub process may not stop
