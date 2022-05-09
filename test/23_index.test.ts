@@ -41,7 +41,11 @@ describe(filename, () => {
     // must inner it()
     const chmod$ = run('chmod u-x', [join(__dirname, file)])
     const ls$ = run('ls -al', [path]).pipe(
-      tap(buf => console.log('file should has no x rights:\n', buf.toString())),
+      tap((val) => {
+        if (Buffer.isBuffer(val)) {
+          console.log('file should has no x rights:\n', val.toString())
+        }
+      }),
     )
 
     const cmds: RxRunFnArgs[] = [
@@ -52,9 +56,11 @@ describe(filename, () => {
     const ret$ = ofrom(cmds).pipe(
       concatMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          tap((buf) => {
-            const ret = buf.toString().trim()
-            assert(! ret.includes('OpenSSL '), `Should not output OpenSSL version. But result: "${ret}"`)
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString().trim()
+              assert(! ret.includes('OpenSSL '), `Should not output OpenSSL version. But result: "${ret}"`)
+            }
           }),
           catchError((err: Error) => {
             const msg = err.message
@@ -82,10 +88,18 @@ describe(filename, () => {
     // must inner it()
     // const chmod$ = run('chmod u+x', [path])
     const ls$ = run('ls -al', [path]).pipe(
-      tap(buf => console.log('file should has x rights:\n', buf.toString())),
+      tap((val) => {
+        if (Buffer.isBuffer(val)) {
+          console.log('file should has x rights:\n', val.toString())
+        }
+      }),
     )
     const cat$ = run('cat', [path]).pipe(
-      tap(buf => console.log('cat file result:\n', buf.toString())),
+      tap((val) => {
+        if (Buffer.isBuffer(val)) {
+          console.log('cat file result:\n', val.toString())
+        }
+      }),
     )
 
     const cmds: RxRunFnArgs[] = [
@@ -108,12 +122,14 @@ describe(filename, () => {
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
           defaultIfEmpty(Buffer.from('foo')),
-          tap((buf) => {
-            const ret = buf.toString().trim()
-            console.info('Runner script result:' + ret)
-            console.info('Runner script result buf:', buf)
-            console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
-            assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString().trim()
+              console.info('Runner script result:' + ret)
+              console.info('Runner script result buf:', val)
+              console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
+              assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
+            }
           }),
           timeout(5000),
         )
@@ -134,10 +150,10 @@ describe(filename, () => {
     // must inner it()
     const chmod$ = run('chmod +x', [path])
     const ls$ = run('ls -al', [path]).pipe(
-      tap(buf => console.log('file should has x rights:\n', buf.toString())),
+      tap(val => Buffer.isBuffer(val) && console.log('file should has x rights:\n', val.toString())),
     )
     const cat$ = run('cat', [path]).pipe(
-      tap(buf => console.log('cat file result:\n', buf.toString())),
+      tap(val => Buffer.isBuffer(val) && console.log('cat file result:\n', val.toString())),
     )
 
     if (! appDirName) {
@@ -165,12 +181,14 @@ describe(filename, () => {
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
           defaultIfEmpty(Buffer.from('foo')),
-          tap((buf) => {
-            const ret = buf.toString().trim()
-            console.info('Runner script result:' + ret)
-            console.info('Runner script result buf:', buf)
-            console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
-            assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
+          tap((val) => {
+            if (Buffer.isBuffer(val)) {
+              const ret = val.toString().trim()
+              console.info('Runner script result:' + ret)
+              console.info('Runner script result buf:', val)
+              console.info(`Runner script cmd: ${cmd}, args: ${args ? args.join(' ') : ''}`)
+              assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
+            }
           }),
           timeout(5000),
         )

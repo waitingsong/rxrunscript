@@ -3,7 +3,7 @@ import assert from 'assert/strict'
 import { spawn, SpawnOptions } from 'child_process'
 import { relative } from 'path'
 
-import { from as ofrom, merge, of, EMPTY, Observable } from 'rxjs'
+import { from as ofrom, merge, of, EMPTY, Observable, filter } from 'rxjs'
 import {
   catchError,
   concatMap,
@@ -348,7 +348,7 @@ function runGenPubKeyFromPrivateKey(
   passwd: string,
   alg: 'rsa' | 'ec',
   spawnOpts: SpawnOptions,
-): Observable<string> {
+): Observable<string | number> {
 
   const cmd = 'openssl'
   const args = [alg, '-pubout']
@@ -363,12 +363,18 @@ function runGenPubKeyFromPrivateKey(
   )
 
   const ret$ = run(cmd, args, { ...spawnOpts, inputStream: input$ }).pipe(
-    map(val => Buffer.isBuffer(val) ? val.toString() : ''),
+    map(val => Buffer.isBuffer(val) ? val.toString() : val.exitCode),
     defaultIfEmpty('no output'),
     tap((pem) => {
-      if (! pem || ! pem.includes('PUBLIC KEY')) {
-        throw new Error('not PUBKEY: ' + pem)
+      if (typeof pem === 'number' && pem !== 0) {
+        throw new Error('not PUBKEY with exitcode: ' + pem.toString())
       }
+      else if (typeof pem === 'string') {
+        if (! pem || ! pem.includes('PUBLIC KEY')) {
+          throw new Error('not PUBKEY: ' + pem)
+        }
+      }
+
     }),
   )
 
