@@ -10,9 +10,9 @@ export function bindProcExit(
   proc: ChildProcess,
 ): Observable<ProcCloseOrExitCodeSignal> {
 
-  const stream$ = fromEvent<ProcCloseOrExitCodeSignal>(proc, 'exit').pipe(
+  const stream$ = fromEvent(proc, 'exit').pipe(
     // tap(val => console.log('bindProcExit data:', val)),
     take(1),
   )
-  return stream$
+  return stream$ as Observable<ProcCloseOrExitCodeSignal>
 }
