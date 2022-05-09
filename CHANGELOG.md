@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/waitingsong/rxrunscript/compare/v8.0.1...v9.0.0) (2022-05-09)
+
+
+### Features
+
+* breaking change return data type may ExitCodeSignal ([9811b9d](https://github.com/waitingsong/rxrunscript/commit/9811b9d2600a43f49c838382efcacbf54072c2ba))
+
 ### [8.0.1](https://github.com/waitingsong/rxrunscript/compare/v8.0.0...v8.0.1) (2022-05-07)
 
 ## [8.0.0](https://github.com/waitingsong/rxrunscript/compare/v7.0.0...v8.0.0) (2022-05-07)
