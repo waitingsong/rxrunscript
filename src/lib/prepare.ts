@@ -1,7 +1,7 @@
 import { join } from 'path'
 
 import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
-import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './model'
+import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './types'
 
 
 export interface ProcessOptsRet {

@@ -9,13 +9,13 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { ExitCodeSignal, MsgPrefixOpts, ProcCloseOrExitCodeSignal, RxSpawnOpts } from './model'
 import { bindProcClose } from './proc-close'
 import { bindProcError } from './proc-error'
 import { bindProcExit } from './proc-exit'
 import { bindStderrData } from './stderr'
 import { bindStdinData } from './stdin'
 import { bindStdoutData } from './stdout'
+import { ExitCodeSignal, MsgPrefixOpts, ProcCloseOrExitCodeSignal, RxSpawnOpts } from './types'
 
 
 export function bindEvent(

@@ -5,8 +5,8 @@ import { catchError, mergeMap } from 'rxjs/operators'
 
 import { bindEvent } from './bindevent'
 import { initialRxRunOpts } from './config'
-import { ExitCodeSignal, RxRunFnArgs } from './model'
 import { processOpts } from './prepare'
+import { ExitCodeSignal, RxRunFnArgs } from './types'
 
 
 /**

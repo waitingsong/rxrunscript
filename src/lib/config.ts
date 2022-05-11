@@ -1,6 +1,6 @@
 import { SpawnOptions } from 'child_process'
 
-import { MsgPrefixOpts, RxSpawnOpts } from './model'
+import { MsgPrefixOpts, RxSpawnOpts } from './types'
 
 
 export const initialSpawnOpts: SpawnOptions = {
