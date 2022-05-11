@@ -15,7 +15,13 @@ import { bindProcExit } from './proc-exit'
 import { bindStderrData } from './stderr'
 import { bindStdinData } from './stdin'
 import { bindStdoutData } from './stdout'
-import { ExitCodeSignal, MsgPrefixOpts, ProcCloseOrExitCodeSignal, RxSpawnOpts } from './types'
+import {
+  ExitCodeSignal,
+  MsgPrefixOpts,
+  OutputRow,
+  ProcCloseOrExitCodeSignal,
+  RxSpawnOpts,
+} from './types'
 
 
 export function bindEvent(
@@ -24,7 +30,7 @@ export function bindEvent(
   msgPrefixOpts: MsgPrefixOpts,
   script: string, // for throw error
   inputStream: RxSpawnOpts['inputStream'],
-): Observable<Buffer | ExitCodeSignal> {
+): Observable<OutputRow> {
 
   const { stderrPrefix } = msgPrefixOpts
 
@@ -59,8 +65,8 @@ export function bindEvent(
     skipUntilNotifier$,
     stderrMaxBufferSize,
   ).pipe(
-    tap((buf) => {
-      const msg = buf.toString()
+    tap((row) => {
+      const msg = row.data.toString()
       throw new Error(`${stderrPrefix} ${script}\n${msg}`)
     }),
   )
@@ -76,12 +82,26 @@ export function bindEvent(
     error$,
     closeOrExit$,
   ).pipe(
+    map((row) => {
+      if (typeof row.exitCode === 'undefined') {
+        return row as OutputRow
+      }
+      const row2: OutputRow = {
+        ...row,
+        data: Buffer.from(''),
+      }
+      return row2
+    }),
     finalize(() => {
       // sub process may not stop
       // link: https://nodejs.org/api/child_process.html#child_process_subprocess_kill_signal
       proc.killed || proc.kill()
     }),
-    defaultIfEmpty(Buffer.from('')),
+    defaultIfEmpty({
+      exitCode: 0,
+      exitSignal: null,
+      data: Buffer.from(''),
+    } as OutputRow),
     // tap(data => console.log(data)),
   )
 

@@ -6,7 +6,6 @@ import { relative } from 'path'
 import { from as ofrom, merge, of, EMPTY, Observable, filter } from 'rxjs'
 import {
   catchError,
-  concatMap,
   defaultIfEmpty,
   delay,
   finalize,
@@ -15,12 +14,10 @@ import {
   mergeMap,
   reduce,
   shareReplay,
-  takeUntil,
   tap,
-  timeout,
 } from 'rxjs/operators'
 
-import { ExitCodeSignal, run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
+import { ExitCodeSignal, OutputRow, run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
 import { bindStderrData } from '../src/lib/stderr'
 import { bindStdinData } from '../src/lib/stdin'
 import { bindStdoutData } from '../src/lib/stdout'
@@ -171,7 +168,7 @@ function genPubKeyFromPrivateKeyWithDefaultValue(
 
   const stdin$ = bindStdinData(proc.stdin, input$)
   const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     defaultIfEmpty('no stdout output'),
     tap((pem) => {
       if (! pem || ! pem.includes('PUBLIC KEY')) {
@@ -180,7 +177,7 @@ function genPubKeyFromPrivateKeyWithDefaultValue(
     }),
   )
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     map((str) => {
       return `stderr: ${str}`
     }),
@@ -221,7 +218,7 @@ function genPubKeyFromPrivateKey(
 
   const stdin$ = bindStdinData(proc.stdin, input$)
   const stdout$ = bindStdoutData(proc.stdout, takeUntilNotifier$).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     // defaultIfEmpty('no stdout output'),
     tap((pem) => {
       if (! pem || ! pem.includes('PUBLIC KEY')) {
@@ -230,7 +227,7 @@ function genPubKeyFromPrivateKey(
     }),
   )
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     map((str) => {
       return `stderr: ${str}`
     }),
@@ -276,7 +273,7 @@ function genPubKeyFromPrivateKeyForError(
 
   const stdin$ = bindStdinData(proc.stdin, input$).pipe()
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     map((str) => {
       return `stderr: ${str}`
     }),
@@ -327,7 +324,7 @@ function genPubKeyFromPrivateKeyForCloseError(
 
   const stdin$ = bindStdinData(proc.stdin, input$)
   const stderr$ = bindStderrData(proc.stderr, takeUntilNotifier$, of('output'), 200).pipe(
-    map(buf => buf.toString()),
+    map(row => row.data.toString()),
     map((str) => {
       return `stderr: ${str}`
     }),
@@ -363,7 +360,7 @@ function runGenPubKeyFromPrivateKey(
   )
 
   const ret$ = run(cmd, args, { ...spawnOpts, inputStream: input$ }).pipe(
-    map(val => Buffer.isBuffer(val) ? val.toString() : val.exitCode),
+    map(row => typeof row.exitCode === 'number' ? row.exitCode : row.data.toString()),
     defaultIfEmpty('no output'),
     tap((pem) => {
       if (typeof pem === 'number' && pem !== 0) {
@@ -395,9 +392,9 @@ function runOpenssl(args: string[], options?: Partial<RxSpawnOpts>): Observable<
 
   return ret$
     .pipe(
-      reduce((acc: Buffer[], curr: Buffer | ExitCodeSignal) => {
-        if (Buffer.isBuffer(curr)) {
-          acc.push(curr)
+      reduce((acc: Buffer[], curr: OutputRow) => {
+        if (typeof curr.exitCode === 'undefined') {
+          acc.push(curr.data)
         }
         return acc
       }, []),

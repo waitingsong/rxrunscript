@@ -1,22 +1,18 @@
 import assert from 'assert/strict'
-import { relative, sep } from 'path'
+import { relative } from 'path'
 
 import { join } from '@waiting/shared-core'
-import { concat, from as ofrom, of, EMPTY } from 'rxjs'
+import { from as ofrom, of, EMPTY } from 'rxjs'
 import {
   catchError,
   concatMap,
-  defaultIfEmpty,
-  filter,
   finalize,
   mergeMap,
-  tap,
-  timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
+import { RxRunFnArgs } from '../src/index'
 
-import { opensslCmds, testIntervalSource } from './helper'
+import { testIntervalSource } from './helper'
 
 
 const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
@@ -39,10 +35,10 @@ describe(filename, () => {
   ]
 
   it('Should work running interval-source.ts with random count serially', (done) => {
-    if (process.platform === 'win32') {
-      console.info('skip test under win32')
-      return done()
-    }
+    // if (process.platform === 'win32') {
+    //   console.info('skip test under win32')
+    //   return done()
+    // }
     console.info('start test count serially:', count)
 
     ofrom(cmds).pipe(

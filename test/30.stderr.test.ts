@@ -8,14 +8,12 @@ import {
   concatMap,
   delay,
   finalize,
-  map,
   mergeMap,
-  reduce,
   tap,
   timeout,
 } from 'rxjs/operators'
 
-import { RxRunFnArgs, RxSpawnOpts } from '../src/index'
+import { OutputRow, RxRunFnArgs, RxSpawnOpts } from '../src/index'
 import { initialRxRunOpts } from '../src/lib/config'
 import { bindStderrData } from '../src/lib/stderr'
 
@@ -305,8 +303,8 @@ function assertNoStderrOutputBindStderrData(
 
   const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
-    tap((buf) => {
-      assert(false, 'Should not emit data' + buf.toString())
+    tap((row) => {
+      assert(false, 'Should not emit data' + row.data.toString())
     }),
     timeout(timeoutVal),
     catchError((err: Error) => {
@@ -326,8 +324,8 @@ function assertWithStderrOutputBindStderrData(
 ) {
   const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
   return bindStderrData(proc.stderr, takeUntilNotifier$, skipUntilNotifier$, 200).pipe(
-    tap((buf) => {
-      assert(buf && buf.byteLength > 0, 'Should emit data, but byteLength zero')
+    tap((row) => {
+      assert(row && row.data && row.data.byteLength > 0, 'Should emit data, but byteLength zero')
     }),
     timeout(15000),
   )
@@ -335,18 +333,22 @@ function assertWithStderrOutputBindStderrData(
 
 
 function assertNoStderrOutput(
-  obb$: Observable<Buffer>,
-): Observable<Buffer> {
+  obb$: Observable<OutputRow>,
+): Observable<OutputRow> {
 
   const random = Math.random().toString()
   const ret$ = obb$.pipe(
-    tap((buf) => {
-      assert(false, 'Should not output from stderr. But got:' + buf.toString())
+    tap((row) => {
+      assert(false, 'Should not output from stderr. But got:' + row.data.toString())
     }),
     timeout(3000),
-    catchError(() => of(Buffer.from(random))),
-    tap((buf) => {
-      assert(buf.toString() === random, 'Should got error thrown by timeout()')
+    catchError(() => {
+      return of({
+        data: Buffer.from(random),
+      } as OutputRow)
+    }),
+    tap((row) => {
+      assert(row.data.toString() === random, 'Should got error thrown by timeout()')
     }),
   )
   return ret$

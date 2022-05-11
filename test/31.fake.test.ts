@@ -23,12 +23,12 @@ describe(filename, () => {
       }, 1), // parallel may cause empty result!
     )
       .subscribe({
-        next: (val) => {
-          if (Buffer.isBuffer(val)) {
-            throw new TypeError('Should not got stdout data:' + val.toString())
+        next: (row) => {
+          if (Buffer.isBuffer(row.data)) {
+            throw new TypeError('Should not got stdout data:' + row.data.toString())
           }
-          else if (val.exitCode !== 0) {
-            throw new TypeError('Should get exitCode zero but got data:' + val.exitCode.toString())
+          else if (typeof row.exitCode === 'number' && row.exitCode !== 0) {
+            throw new TypeError('Should get exitCode zero but got data:' + row.exitCode.toString())
           }
         },
         error: (ex: Error) => {

@@ -11,13 +11,15 @@ import {
   takeUntil,
 } from 'rxjs/operators'
 
+import { OutputRow } from './types'
+
 
 export function bindStderrData(
   stderr: ChildProcess['stderr'],
   takeUntilNotifier$: Observable<unknown>,
   skipUntilNofifier$: Observable<unknown>,
   bufMaxSize: number,
-): Observable<Buffer> {
+): Observable<OutputRow> {
 
   if (! stderr) {
     throw new Error('stderr null')
@@ -49,6 +51,7 @@ export function bindStderrData(
 
   const ret$ = data$.pipe(
     skipUntil<Buffer>(skip$),
+    map(data => ({ data })),
   )
 
   return ret$

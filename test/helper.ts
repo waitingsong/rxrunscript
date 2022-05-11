@@ -5,7 +5,7 @@ import {
   catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
 } from 'rxjs/operators'
 
-import { run, MsgPrefixOpts, RxRunFnArgs, ExitCodeSignal } from '../src/index'
+import { run, MsgPrefixOpts, RxRunFnArgs, ExitCodeSignal, OutputRow } from '../src/index'
 
 
 export const fakeCmds: RxRunFnArgs[] = [
@@ -169,7 +169,7 @@ export function testIntervalSource(
 ): Observable<string[]> {
 
   return run(cmd, args, opts).pipe(
-    map(buf => Buffer.isBuffer(buf) ? buf.toString() : ''),
+    map(row => Buffer.isBuffer(row.data) ? row.data.toString() : ''),
     tap((ret) => {
       console.log('got:', ret.trim())
     }),
@@ -198,9 +198,9 @@ export function assertOpensslWithStderrOutput(
 ): Observable<Buffer> {
 
   const ret = run(cmd, args, opts).pipe(
-    reduce((acc: Buffer[], curr: Buffer | ExitCodeSignal) => {
-      if (Buffer.isBuffer(curr)) {
-        acc.push(curr)
+    reduce((acc: Buffer[], curr: OutputRow) => {
+      if (typeof curr.exitCode === 'undefined') {
+        acc.push(curr.data)
       }
       return acc
     }, []),

@@ -6,7 +6,7 @@ import { catchError, mergeMap } from 'rxjs/operators'
 import { bindEvent } from './bindevent'
 import { initialRxRunOpts } from './config'
 import { processOpts } from './prepare'
-import { ExitCodeSignal, RxRunFnArgs } from './types'
+import { OutputRow, RxRunFnArgs } from './types'
 
 
 /**
@@ -22,7 +22,7 @@ export function run(
   command: RxRunFnArgs[0],
   args?: RxRunFnArgs[1],
   options?: RxRunFnArgs[2],
-): Observable<Buffer | ExitCodeSignal> {
+): Observable<OutputRow> {
 
   const opts = processOpts({
     command, args, spawnOpts: options, initialRxRunOpts,

@@ -1,19 +1,14 @@
 import assert from 'assert/strict'
 import { relative } from 'path'
 
-import { concat, from as ofrom, of, EMPTY } from 'rxjs'
+import { from as ofrom } from 'rxjs'
 import {
-  catchError,
-  concatMap,
   defaultIfEmpty,
-  filter,
-  finalize,
   mergeMap,
-  tap,
   timeout,
 } from 'rxjs/operators'
 
-import { ExitCodeSignal, run, RxRunFnArgs } from '../src/index'
+import { ExitCodeSignal, OutputRow, run, RxRunFnArgs } from '../src/index'
 
 
 const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
@@ -30,15 +25,17 @@ describe(filename, () => {
     ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(
-          defaultIfEmpty(Buffer.from('Should empty value')),
+          defaultIfEmpty({
+            data: Buffer.from('Should empty value'),
+          }),
           timeout(5000),
         )
       }),
     )
       .subscribe({
-        next: (val: Buffer | ExitCodeSignal) => {
-          if (Buffer.isBuffer(val)) {
-            assert(! val.byteLength, 'Should result empty, but got: ' + val.toString())
+        next: (row: OutputRow) => {
+          if (typeof row.exitCode === 'undefined' && Buffer.isBuffer(row.data)) {
+            assert(! row.data.byteLength, 'Should result empty, but got: ' + row.data.toString())
           }
         },
         error: (err) => {

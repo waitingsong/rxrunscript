@@ -47,11 +47,21 @@ export interface RxRunFnArgs extends
  */
 export type ProcCloseOrExitCodeSignal = [ExitCode, ExitSignal]
 export interface ExitCodeSignal {
-  exitCode: number
-  exitSignal: string | null
+  readonly exitCode: number
+  readonly exitSignal: string | null
 }
 export type ExitCode = number
 export type ExitSignal = string | null
+
+export interface OutputRow {
+  /**
+   * - number menas the last row,  0: success, other: error
+   * - undefined means not the last row
+   */
+  readonly exitCode?: ExitCodeSignal['exitCode']
+  readonly exitSignal?: ExitCodeSignal['exitSignal']
+  readonly data: Buffer
+}
 
 
 /** Inner usage for processOpts() */

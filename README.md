@@ -17,45 +17,49 @@ $ npm install rxrunscript
 
 ## Usage
 ```ts
-import { run } from 'rxrunscript'
-import { take } from 'rxjs/operators'
+import { OutputRow, run, take } from 'rxrunscript'
 
 run('openssl version')
   .pipe(
     take(1),  // assume all output in one buffer
   )
-  .subscribe(
-    buf => console.log(buf.toString()), 
-    err => console.error(err),
-  ) 
+  .subscribe({
+    next: (row) => {
+      console.log(row.data.toString()), 
+    },
+    error: (err) => {
+      console.error(err),
+    },
+  }) 
 
 // exec shell file
 run('./test/openssl.sh')
-  .subscribe(
-    arr => console.log(buf.toString()),
-  )
+  .subscribe({
+    next: (row) => console.log(buf.toString()),
+  })
 
 
-import { reduce } from 'rxjs/operators'
+import { reduce } from 'rxjs'
 
 // win32
 run('tasklist')
   .pipe(
-    reduce((acc: Buffer[], curr: Buffer) => {
-      acc.push(curr)
+    reduce((acc: Buffer[], curr: OutputRow) => {
+      if (typeof curr.exitCode === 'undefined') {
+        acc.push(curr)
+      }
       return acc
     }, []),
   )
   .subscribe(
     arr => console.log(Buffer.concat(arr).toString()),
     err => console.error(err),
-    () => console.log('complete'),
   )
 
 // run cmd file
 run('./test/prepare.cmd')
   .subscribe(
-    arr => console.log(buf.toString()),
+    row => console.log(row.data.toString()),
   )
 
 ```
