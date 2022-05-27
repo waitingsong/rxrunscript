@@ -2,17 +2,20 @@ import assert from 'node:assert/strict'
 import { sep, join } from 'path'
 
 import { fileShortPath, genCurrentDirname } from '@waiting/shared-core'
-import { concat, from as ofrom, of } from 'rxjs'
 import {
+  concat,
+  from as ofrom,
+  of,
   catchError,
   concatMap,
   defaultIfEmpty,
   filter,
   finalize,
+  firstValueFrom,
   mergeMap,
   tap,
   timeout,
-} from 'rxjs/operators'
+} from 'rxjs'
 
 import { run, RxRunFnArgs } from '../src/index.js'
 
@@ -80,7 +83,7 @@ describe(fileShortPath(import.meta.url), () => {
       .subscribe()
   })
 
-  it(`Should running "${file}" work`, (done) => {
+  it(`Should running "${file}" work`, async () => {
     assert(typeof appDirName === 'string' && appDirName.length > 0, 'Working folder invalid')
 
     const isTravis = __dirname.includes('travis')
@@ -94,6 +97,12 @@ describe(fileShortPath(import.meta.url), () => {
         }
       }),
     )
+    const ret1 = await firstValueFrom(ls$)
+    assert(ret1, 'Should get ls result')
+    console.log('001')
+    console.log({ ret1: ret1.data.toString() })
+
+
     const cat$ = run('cat', [path]).pipe(
       tap((val) => {
         if (Buffer.isBuffer(val)) {
@@ -101,6 +110,11 @@ describe(fileShortPath(import.meta.url), () => {
         }
       }),
     )
+    const ret2 = await firstValueFrom(cat$)
+    assert(ret2, 'Should get cat result')
+    console.log('002')
+    console.log({ ret2: ret1.data.toString() })
+
 
     const cmds: RxRunFnArgs[] = [
       ['sh', [path] ],
@@ -110,7 +124,8 @@ describe(fileShortPath(import.meta.url), () => {
     ]
     const ret$ = ofrom(cmds).pipe(
       filter(([cmd, args]) => {
-        console.info(`\nStarting cmds: "${cmd}"`, args && args.length ? args[0] : '')
+        const msg = `\nStarting cmds: ${cmd} ${args && args[0] ? args[0] : ''}`
+        console.info(msg)
         const skipped = ! isTravis
         if (isTravis) {
           console.info(
@@ -134,12 +149,10 @@ describe(fileShortPath(import.meta.url), () => {
           timeout(90000),
         )
       }, 1),
-      finalize(() => done()),
     )
 
-    concat(ls$, cat$, ret$)
-      .pipe(timeout(90000))
-      .subscribe()
+    console.log('003')
+    await firstValueFrom(ret$)
   })
 
   it.skip(`Should running "${file}" work`, (done) => {
