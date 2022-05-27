@@ -82,7 +82,6 @@ jobs:
       - name: Build
         run: |
           whoami
-          ls -al .scripts/ci
           export cwd=`pwd`
           . .scripts/ci/ci-env.sh
           .scripts/ci/ci-prepare.sh

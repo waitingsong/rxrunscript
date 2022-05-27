@@ -1,12 +1,12 @@
-import { spawn, ChildProcess, SpawnOptions } from 'child_process'
+import { spawn, ChildProcess, SpawnOptions } from 'node:child_process'
 
 import { of, throwError, Observable } from 'rxjs'
 import { catchError, mergeMap } from 'rxjs/operators'
 
-import { bindEvent } from './bindevent'
-import { initialRxRunOpts } from './config'
-import { processOpts } from './prepare'
-import { OutputRow, RxRunFnArgs } from './types'
+import { bindEvent } from './bindevent.js'
+import { initialRxRunOpts } from './config.js'
+import { processOpts } from './prepare.js'
+import { OutputRow, RxRunFnArgs } from './types.js'
 
 
 /**

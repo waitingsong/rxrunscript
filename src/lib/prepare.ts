@@ -1,7 +1,7 @@
-import { join } from 'path'
+import { join } from 'node:path'
 
-import { initialMsgPrefixOpts, initialSpawnOpts } from './config'
-import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './types'
+import { initialMsgPrefixOpts, initialSpawnOpts } from './config.js'
+import { ProcessOpts, RxRunFnArgs, RxSpawnOpts } from './types.js'
 
 
 export interface ProcessOptsRet {

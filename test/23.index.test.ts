@@ -1,8 +1,8 @@
-import assert from 'assert/strict'
-import { sep, relative } from 'path'
+import assert from 'node:assert/strict'
+import { sep, join } from 'path'
 
-import { join } from '@waiting/shared-core'
-import { concat, from as ofrom, of, EMPTY } from 'rxjs'
+import { fileShortPath, genCurrentDirname } from '@waiting/shared-core'
+import { concat, from as ofrom, of } from 'rxjs'
 import {
   catchError,
   concatMap,
@@ -14,15 +14,15 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
+import { run, RxRunFnArgs } from '../src/index.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
+const __dirname = genCurrentDirname(import.meta.url)
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   const file = 'openssl.sh'
   const path = join(__dirname, file)
-  const appDirName = __dirname.split(sep).slice(-2, -1)[0]
+  const appDirName = join(__dirname, '..')
 
   if (process.platform === 'win32') {
     console.info('skip test under win32')
@@ -76,7 +76,7 @@ describe(filename, () => {
     )
 
     concat(chmod$, ls$, ret$)
-      .pipe(timeout(30000))
+      .pipe(timeout(90000))
       .subscribe()
   })
 
@@ -131,14 +131,14 @@ describe(filename, () => {
               assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
             }
           }),
-          timeout(5000),
+          timeout(90000),
         )
       }, 1),
       finalize(() => done()),
     )
 
     concat(ls$, cat$, ret$)
-      .pipe(timeout(50000))
+      .pipe(timeout(90000))
       .subscribe()
   })
 
@@ -190,14 +190,14 @@ describe(filename, () => {
               assert(ret.includes('OpenSSL '), `Should output OpenSSL version. But result: "${ret}"`)
             }
           }),
-          timeout(5000),
+          timeout(60000),
         )
       }, 1),
       finalize(() => done()),
     )
 
     concat(chmod$, ls$, cat$, ret$)
-      .pipe(timeout(50000))
+      .pipe(timeout(90000))
       .subscribe()
   })
 

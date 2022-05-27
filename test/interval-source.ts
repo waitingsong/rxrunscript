@@ -1,15 +1,14 @@
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { interval } from 'rxjs'
-import { take } from 'rxjs/operators'
-// eslint-disable-next-line node/no-unpublished-import
-import yargs from 'yargs'
+import assert from 'node:assert'
+
+import minimist from 'minimist'
+import { interval, take } from 'rxjs'
 
 
-const args: (string|number)[] = typeof yargs.argv._ === 'object'
-  ? yargs.argv._
-  : []
-const limit = args[0] ? +args[0] : 'fake'
+const argv = minimist(process.argv.slice(2))
+
+assert(argv, 'argv invalid')
+const count = (argv.count as string || undefined) ?? 'fake'
+const limit = +count
 
 if (Number.isNaN(limit)) {
   throw new Error('take number invaid')

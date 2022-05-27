@@ -1,7 +1,7 @@
-import assert from 'assert/strict'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
-import { from as ofrom, of, NEVER, Observable } from 'rxjs'
+import { fileShortPath } from '@waiting/shared-core'
+import { from as ofrom, of } from 'rxjs'
 import {
   catchError,
   finalize,
@@ -9,15 +9,13 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { run, RxSpawnOpts } from '../src/index'
-import { initialMsgPrefixOpts } from '../src/lib/config'
+import { run, RxSpawnOpts } from '../src/index.js'
+import { initialMsgPrefixOpts } from '../src/lib/config.js'
 
-import { assetRunError, opensslCmds } from './helper'
+import { assetRunError, opensslCmds } from './helper.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   it('Should runSpawn() throw Error', (done) => {
     const gid = 123456789

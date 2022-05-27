@@ -1,4 +1,4 @@
-import { ChildProcess } from 'child_process'
+import { ChildProcess } from 'node:child_process'
 
 import { map, merge, of, race, EMPTY, Observable } from 'rxjs'
 import {
@@ -9,19 +9,19 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { bindProcClose } from './proc-close'
-import { bindProcError } from './proc-error'
-import { bindProcExit } from './proc-exit'
-import { bindStderrData } from './stderr'
-import { bindStdinData } from './stdin'
-import { bindStdoutData } from './stdout'
+import { bindProcClose } from './proc-close.js'
+import { bindProcError } from './proc-error.js'
+import { bindProcExit } from './proc-exit.js'
+import { bindStderrData } from './stderr.js'
+import { bindStdinData } from './stdin.js'
+import { bindStdoutData } from './stdout.js'
 import {
   ExitCodeSignal,
   MsgPrefixOpts,
   OutputRow,
   ProcCloseOrExitCodeSignal,
   RxSpawnOpts,
-} from './types'
+} from './types.js'
 
 
 export function bindEvent(

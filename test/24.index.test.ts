@@ -1,6 +1,6 @@
-import assert from 'assert/strict'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
+import { fileShortPath } from '@waiting/shared-core'
 import { from as ofrom } from 'rxjs'
 import {
   defaultIfEmpty,
@@ -8,12 +8,10 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { ExitCodeSignal, OutputRow, run, RxRunFnArgs } from '../src/index'
+import { OutputRow, run, RxRunFnArgs } from '../src/index.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   it('Should work without any output', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['cd /'],
@@ -28,7 +26,7 @@ describe(filename, () => {
           defaultIfEmpty({
             data: Buffer.from('Should empty value'),
           }),
-          timeout(5000),
+          timeout(30000),
         )
       }),
     )

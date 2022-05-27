@@ -1,19 +1,17 @@
-import assert from 'assert/strict'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
+import { fileShortPath } from '@waiting/shared-core'
 import { from as ofrom, of } from 'rxjs'
 import { finalize, map, mergeMap, tap } from 'rxjs/operators'
 
-import { ProcessOpts } from '../src/index'
-import { initialMsgPrefixOpts, initialRxRunOpts } from '../src/lib/config'
-import { processOpts } from '../src/lib/prepare'
+import { ProcessOpts } from '../src/index.js'
+import { initialMsgPrefixOpts, initialRxRunOpts } from '../src/lib/config.js'
+import { processOpts } from '../src/lib/prepare.js'
 
-import { assetRunError } from './helper'
+import { assetRunError } from './helper.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   describe('Should processOpts() work', () => {
 
     it('blank command', (done) => {

@@ -1,9 +1,9 @@
 /* eslint-disable node/no-unpublished-import */
-import assert from 'assert/strict'
-import { spawn, SpawnOptions } from 'child_process'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
+import { spawn, SpawnOptions } from 'node:child_process'
 
-import { from as ofrom, merge, of, EMPTY, Observable, filter } from 'rxjs'
+import { fileShortPath } from '@waiting/shared-core'
+import { from as ofrom, merge, of, EMPTY, Observable } from 'rxjs'
 import {
   catchError,
   defaultIfEmpty,
@@ -17,15 +17,13 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { ExitCodeSignal, OutputRow, run, RxRunFnArgs, RxSpawnOpts } from '../src/index'
-import { bindStderrData } from '../src/lib/stderr'
-import { bindStdinData } from '../src/lib/stdin'
-import { bindStdoutData } from '../src/lib/stdout'
+import { OutputRow, run, RxSpawnOpts } from '../src/index.js'
+import { bindStderrData } from '../src/lib/stderr.js'
+import { bindStdinData } from '../src/lib/stdin.js'
+import { bindStdoutData } from '../src/lib/stdout.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   describe('Should bindStdinData() work', () => {
     const spawnOpts: SpawnOptions = {
@@ -103,7 +101,7 @@ describe(filename, () => {
 })
 
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   describe('Should stdin work', () => {
     const spawnOpts: SpawnOptions = {

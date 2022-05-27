@@ -1,29 +1,22 @@
-import assert from 'assert/strict'
-import { sep, relative } from 'path'
+import assert from 'node:assert/strict'
+import { sep, join } from 'path'
 
-import { join } from '@waiting/shared-core'
-import { concat, from as ofrom, of, EMPTY } from 'rxjs'
+import { fileShortPath, genCurrentDirname } from '@waiting/shared-core'
+import { from as ofrom } from 'rxjs'
 import {
-  catchError,
-  concatMap,
-  defaultIfEmpty,
-  filter,
   finalize,
   mergeMap,
   tap,
-  timeout,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
-
-import { opensslCmds, testIntervalSource } from './helper'
+import { run, RxRunFnArgs } from '../src/index.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
+const __dirname = genCurrentDirname(import.meta.url)
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   const file = 'prepare.cmd'
-  const appDirName = __dirname.split(sep).slice(-2, -1)[0]
+  const appDirName = join(__dirname, '..')
 
   if (process.platform !== 'win32') {
     console.info('skip test under non-win32')
@@ -45,9 +38,14 @@ describe(filename, () => {
       [join('./test', file), [Math.random().toString()] ],
       [join('./test', file), [Math.random().toString(), '--'] ],
 
-      [`../${appDirName}/test/${file}`, [Math.random().toString()] ],
-      [join('..', appDirName, 'test', file), [Math.random().toString()] ],
+      [`${appDirName}/test/${file}`, [Math.random().toString()] ],
+      [join(appDirName, 'test', file), [Math.random().toString()] ],
     ]
+
+    cmds.forEach((value) => {
+      console.log('value:', value)
+    })
+
     const ret$ = ofrom(cmds).pipe(
       mergeMap(([cmd, args, opts]) => {
         return run(cmd, args, opts).pipe(

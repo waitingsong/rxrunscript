@@ -1,11 +1,9 @@
-import assert from 'assert/strict'
+import assert from 'node:assert/strict'
 
 import { from as ofrom, of, Observable } from 'rxjs'
-import {
-  catchError, concatMap, filter, finalize, map, mergeMap, reduce, tap,
-} from 'rxjs/operators'
+import { catchError, concatMap, filter, finalize, map, reduce, tap } from 'rxjs/operators'
 
-import { run, MsgPrefixOpts, RxRunFnArgs, ExitCodeSignal, OutputRow } from '../src/index'
+import { run, MsgPrefixOpts, RxRunFnArgs, OutputRow } from '../src/index.js'
 
 
 export const fakeCmds: RxRunFnArgs[] = [

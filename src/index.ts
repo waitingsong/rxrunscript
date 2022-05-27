@@ -1,3 +1,3 @@
 
-export * from './lib/index'
-export * from './lib/types'
+export * from './lib/index.js'
+export * from './lib/types.js'

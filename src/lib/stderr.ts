@@ -1,4 +1,4 @@
-import { ChildProcess } from 'child_process'
+import { ChildProcess } from 'node:child_process'
 
 import { fromEvent, NEVER, Observable } from 'rxjs'
 import {
@@ -11,7 +11,7 @@ import {
   takeUntil,
 } from 'rxjs/operators'
 
-import { OutputRow } from './types'
+import { OutputRow } from './types.js'
 
 
 export function bindStderrData(

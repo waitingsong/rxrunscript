@@ -1,14 +1,15 @@
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
-import { initialMsgPrefixOpts } from '../src/lib/config'
+import { fileShortPath } from '@waiting/shared-core'
 
-import { fakeCmds, testStderrPrefixWithExitError } from './helper'
+import { initialMsgPrefixOpts } from '../src/lib/config.js'
+
+import { fakeCmds, testStderrPrefixWithExitError } from './helper.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
 const { stderrPrefix: stderrPrefixOri } = initialMsgPrefixOpts
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   after(() => {
     initialMsgPrefixOpts.stderrPrefix = stderrPrefixOri
   })

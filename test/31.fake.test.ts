@@ -1,15 +1,13 @@
-import assert from 'assert/strict'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
+import { fileShortPath } from '@waiting/shared-core'
 import { from as ofrom } from 'rxjs'
 import { mergeMap } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
+import { run, RxRunFnArgs } from '../src/index.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   it('Should work running fake cmd', (done) => {
     const cmds: RxRunFnArgs[] = [ ['fakexxx '] ]
 

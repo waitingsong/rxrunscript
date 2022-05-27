@@ -1,9 +1,9 @@
-import { ChildProcess } from 'child_process'
+import { ChildProcess } from 'node:child_process'
 
 import { fromEvent, Observable, map } from 'rxjs'
 import { shareReplay, take, takeUntil } from 'rxjs/operators'
 
-import { OutputRow } from './types'
+import { OutputRow } from './types.js'
 
 
 export function bindStdoutData(

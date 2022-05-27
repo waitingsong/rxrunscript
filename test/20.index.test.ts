@@ -1,7 +1,7 @@
-import assert from 'assert/strict'
-import { sep, relative } from 'path'
+import assert from 'node:assert/strict'
 
-import { concat, from as ofrom, of, EMPTY } from 'rxjs'
+import { fileShortPath } from '@waiting/shared-core'
+import { from as ofrom, of } from 'rxjs'
 import {
   catchError,
   finalize,
@@ -9,14 +9,10 @@ import {
   tap,
 } from 'rxjs/operators'
 
-import { run, RxRunFnArgs } from '../src/index'
-
-import { opensslCmds, testIntervalSource } from './helper'
+import { run, RxRunFnArgs } from '../src/index.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   it('Should work running openssl', (done) => {
     const cmds: RxRunFnArgs[] = [
       ['openssl version'],

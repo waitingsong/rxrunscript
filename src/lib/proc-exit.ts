@@ -1,9 +1,9 @@
-import { ChildProcess } from 'child_process'
+import { ChildProcess } from 'node:child_process'
 
 import { fromEvent, Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 
-import { ProcCloseOrExitCodeSignal } from './types'
+import { ProcCloseOrExitCodeSignal } from './types.js'
 
 
 export function bindProcExit(

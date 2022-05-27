@@ -1,7 +1,7 @@
-import assert from 'assert/strict'
-import { spawn, SpawnOptions } from 'child_process'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
+import { spawn, SpawnOptions } from 'node:child_process'
 
+import { fileShortPath } from '@waiting/shared-core'
 import { from as ofrom, of, NEVER, Observable } from 'rxjs'
 import {
   catchError,
@@ -13,20 +13,18 @@ import {
   timeout,
 } from 'rxjs/operators'
 
-import { OutputRow, RxRunFnArgs, RxSpawnOpts } from '../src/index'
-import { initialRxRunOpts } from '../src/lib/config'
-import { bindStderrData } from '../src/lib/stderr'
+import { OutputRow, RxRunFnArgs, RxSpawnOpts } from '../src/index.js'
+import { initialRxRunOpts } from '../src/lib/config.js'
+import { bindStderrData } from '../src/lib/stderr.js'
 
 import {
   assertOpensslWithStderrOutput,
   fakeCmds,
   opensslCmds,
-} from './helper'
+} from './helper.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
-
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   it('Should ignore stderr with maxStderrBuffer: 0', (done) => {
     const stderrMaxBufferSize = 0
@@ -69,7 +67,7 @@ describe(filename, () => {
 })
 
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   describe('Should bindStderrData() work', () => {
     const spawnOpts: SpawnOptions = {
@@ -136,7 +134,7 @@ describe(filename, () => {
 })
 
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   describe('Should bindStderrData() work with takeUntilNotifier', () => {
     const spawnOpts: SpawnOptions = {
@@ -205,7 +203,7 @@ describe(filename, () => {
 })
 
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
 
   describe('Should bindStderrData() work with skipUntilNotifier', () => {
     const spawnOpts: SpawnOptions = {
@@ -298,7 +296,7 @@ function assertNoStderrOutputBindStderrData(
   spawnOpts: RxRunFnArgs[2],
   takeUntilNotifier$: Observable<any>,
   skipUntilNotifier$: Observable<any>,
-  timeoutVal = 5000,
+  timeoutVal = 30000,
 ) {
 
   const proc = spawn(cmd, args ? args : [], spawnOpts ? spawnOpts : {})
@@ -327,7 +325,7 @@ function assertWithStderrOutputBindStderrData(
     tap((row) => {
       assert(row && row.data && row.data.byteLength > 0, 'Should emit data, but byteLength zero')
     }),
-    timeout(15000),
+    timeout(25000),
   )
 }
 
@@ -341,7 +339,7 @@ function assertNoStderrOutput(
     tap((row) => {
       assert(false, 'Should not output from stderr. But got:' + row.data.toString())
     }),
-    timeout(3000),
+    timeout(10000),
     catchError(() => {
       return of({
         data: Buffer.from(random),

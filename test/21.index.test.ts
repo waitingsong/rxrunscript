@@ -1,7 +1,6 @@
-import assert from 'assert/strict'
-import { relative } from 'path'
+import assert from 'node:assert/strict'
 
-import { join } from '@waiting/shared-core'
+import { fileShortPath, genCurrentDirname, join } from '@waiting/shared-core'
 import { from as ofrom, of, EMPTY } from 'rxjs'
 import {
   catchError,
@@ -10,14 +9,14 @@ import {
   mergeMap,
 } from 'rxjs/operators'
 
-import { RxRunFnArgs } from '../src/index'
+import { RxRunFnArgs } from '../src/index.js'
 
-import { testIntervalSource } from './helper'
+import { testIntervalSource } from './helper.js'
 
 
-const filename = relative(process.cwd(), __filename).replace(/\\/ug, '/')
+const __dirname = genCurrentDirname(import.meta.url)
 
-describe(filename, () => {
+describe(fileShortPath(import.meta.url), () => {
   const file = join(__dirname, 'interval-source.ts')
   const tsConfig = join(__dirname, 'tsconfig.json')
   let count = Math.floor(Math.random() * 10)
@@ -29,9 +28,9 @@ describe(filename, () => {
     count = 3
   }
   const cmds: RxRunFnArgs[] = [
-    [`ts-node -P "${tsConfig}" ${file} ${count}`, null, options],
-    [' ts-node ', [` -P "${tsConfig}" ${file} ${count}`], options],
-    ['ts-node ', [`-P "${tsConfig}"`, file, count.toString()], options],
+    [`ts-node-esm -P "${tsConfig}" ${file} --count ${count}`, null, options],
+    [' ts-node-esm ', [` -P "${tsConfig}" ${file} --count ${count}`], options],
+    ['ts-node-esm ', [`-P "${tsConfig}"`, file, ' --count', count.toString()], options],
   ]
 
   it('Should work running interval-source.ts with random count serially', (done) => {
