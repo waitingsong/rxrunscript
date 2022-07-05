@@ -37,8 +37,8 @@ export interface RxRunFnArgs extends
   /** command */
   0: string
   /** args */
-  1?: readonly string[] | null
-  2?: Partial<RxSpawnOpts> | null
+  1?: readonly string[] | null | undefined
+  2?: Partial<RxSpawnOpts> | null | undefined
 }
 
 

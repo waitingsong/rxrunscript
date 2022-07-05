@@ -25,7 +25,10 @@ export function run(
 ): Observable<OutputRow> {
 
   const opts = processOpts({
-    command, args, spawnOpts: options, initialRxRunOpts,
+    command,
+    args,
+    spawnOpts: options,
+    initialRxRunOpts,
   })
   const { errScript } = opts
   const { errPrefix, stderrPrefix } = opts.spawnOpts.msgPrefixOpts
