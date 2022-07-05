@@ -25,7 +25,7 @@
   "homepage": "https://github.com/waitingsong/rxrunscript#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/waitingsong/rxrunscript.git"
+    "url": "https://github.com/waitingsong/rxrunscript.git"
   },
   "license": "MIT",
   "dependencies": {
@@ -36,12 +36,13 @@
     "@commitlint/config-conventional": "17",
     "@rollup/plugin-commonjs": "22",
     "@rollup/plugin-node-resolve": "13",
+    "@swc/core": "^1.2.197",
     "@types/mocha": "9",
     "@types/node": "17",
     "@types/rewire": "2",
     "@types/rimraf": "3",
     "@types/yargs": "17",
-    "@waiting/eslint-config": "^8.0.0",
+    "@waiting/eslint-config": "^8.0.2",
     "@waiting/shared-core": "^18.0.0",
     "coveralls": "3",
     "cross-env": "7",
